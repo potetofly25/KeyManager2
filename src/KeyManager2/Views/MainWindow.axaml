@@ -1,0 +1,54 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:potetofly25.KeyManager2.ViewModels"
+        x:Class="potetofly25.KeyManager2.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="KeyManager2" Width="1000" Height="600">
+    
+    <Window.DataContext>
+        <vm:MainWindowViewModel />
+    </Window.DataContext>
+
+  <DockPanel Margin="12">
+    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Spacing="8">
+      <TextBox Width="320" Watermark="Search" Text="{Binding SearchText, Mode=TwoWay}"/>
+        <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory, Mode=TwoWay}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+      <Button Content="Refresh" Command="{Binding RefreshCommand}" />
+    </StackPanel>
+    <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,*">
+      <StackPanel Grid.Column="0" Margin="8">
+        <TextBlock Text="Tag Cloud" FontWeight="Bold"/>
+        <ScrollViewer Height="400">
+          <WrapPanel Name="TagCloudPanel" />
+        </ScrollViewer>
+      </StackPanel>
+      <DataGrid Name="DataGrid" Grid.Column="1" ItemsSource="{Binding Credentials}" AutoGenerateColumns="False">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50" IsReadOnly="True"/>
+          <DataGridTextColumn Header="Login" Binding="{Binding LoginId}" Width="2*"/>
+          <DataGridTextColumn Header="Password" Binding="{Binding Password}" Width="2*"/>
+          <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="*"/>
+          <DataGridTextColumn Header="Tags" Binding="{Binding Tags}" Width="2*"/>
+          <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="3*"/>
+        </DataGrid.Columns>
+      </DataGrid>
+    </Grid>
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+      <Button Name="NewBtn" Content="New" Width="90"/>
+      <Button Name="EditBtn" Content="Edit Selected" Width="120"/>
+      <Button Name="DeleteBtn" Content="Delete Selected" Width="120"/>
+      <Button Name="CopyBtn" Content="Copy Password" Width="120"/>
+      <Button Name="SetMasterBtn" Content="Set Master Password" Width="180"/>
+      <Button Name="ExportBtn" Content="Export Backup" Width="140"/>
+      <Button Name="ImportBtn" Content="Import Backup" Width="140"/>
+    </StackPanel>
+  </DockPanel>
+</Window>
