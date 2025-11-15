@@ -1,3 +1,4 @@
+<!-- メインウィンドウの定義：アプリ全体の一覧画面 -->
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,48 +8,124 @@
         x:DataType="vm:MainWindowViewModel"
         Title="KeyManager2" Width="1000" Height="600">
     
+    <!-- ViewModel を XAML 側で生成して DataContext に設定 -->
     <Window.DataContext>
         <vm:MainWindowViewModel />
     </Window.DataContext>
 
-  <DockPanel Margin="12">
-    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Spacing="8">
-      <TextBox Width="320" Watermark="Search" Text="{Binding SearchText, Mode=TwoWay}"/>
-        <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory, Mode=TwoWay}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-      <Button Content="Refresh" Command="{Binding RefreshCommand}" />
-    </StackPanel>
-    <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,*">
-      <StackPanel Grid.Column="0" Margin="8">
-        <TextBlock Text="Tag Cloud" FontWeight="Bold"/>
-        <ScrollViewer Height="400">
-          <WrapPanel Name="TagCloudPanel" />
-        </ScrollViewer>
-      </StackPanel>
-      <DataGrid Name="DataGrid" Grid.Column="1" ItemsSource="{Binding Credentials}" AutoGenerateColumns="False">
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50" IsReadOnly="True"/>
-          <DataGridTextColumn Header="Login" Binding="{Binding LoginId}" Width="2*"/>
-          <DataGridTextColumn Header="Password" Binding="{Binding Password}" Width="2*"/>
-          <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="*"/>
-          <DataGridTextColumn Header="Tags" Binding="{Binding Tags}" Width="2*"/>
-          <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="3*"/>
-        </DataGrid.Columns>
-      </DataGrid>
-    </Grid>
-    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
-      <Button Name="NewBtn" Content="New" Width="90"/>
-      <Button Name="EditBtn" Content="Edit Selected" Width="120"/>
-      <Button Name="DeleteBtn" Content="Delete Selected" Width="120"/>
-      <Button Name="CopyBtn" Content="Copy Password" Width="120"/>
-      <Button Name="SetMasterBtn" Content="Set Master Password" Width="180"/>
-      <Button Name="ExportBtn" Content="Export Backup" Width="140"/>
-      <Button Name="ImportBtn" Content="Import Backup" Width="140"/>
-    </StackPanel>
-  </DockPanel>
+    <!-- 画面全体をレイアウトする DockPanel -->
+    <DockPanel Margin="12">
+
+        <!-- 上部の検索バーとカテゴリフィルタ、リフレッシュボタンエリア -->
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Spacing="8">
+            <!-- テキスト検索ボックス：SearchText と双方向バインド -->
+            <TextBox Width="320"
+                     Watermark="Search"
+                     Text="{Binding SearchText, Mode=TwoWay}"/>
+
+            <!-- カテゴリ選択コンボボックス：Categories から選択し SelectedCategory にバインド -->
+            <ComboBox ItemsSource="{Binding Categories}"
+                      SelectedItem="{Binding SelectedCategory, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <!-- カテゴリ名を表示する TextBlock（単純な文字列バインド） -->
+                        <TextBlock Text="{Binding}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <!-- 手動で一覧を再読み込みする Refresh ボタン -->
+            <Button Content="Refresh"
+                    Command="{Binding RefreshCommand}" />
+        </StackPanel>
+
+        <!-- 中央エリア：左側にタグクラウド、右側に DataGrid を配置 -->
+        <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,*">
+            <!-- 左側：タグクラウド表示エリア -->
+            <StackPanel Grid.Column="0" Margin="8">
+                <TextBlock Text="Tag Cloud" FontWeight="Bold"/>
+                <!-- タグクラウドをスクロール可能にする ScrollViewer -->
+                <ScrollViewer Height="400">
+                    <!-- コードビハインド側から動的にタグを追加する WrapPanel -->
+                    <WrapPanel Name="TagCloudPanel" />
+                </ScrollViewer>
+            </StackPanel>
+
+            <!-- 右側：資格情報一覧を表示する DataGrid -->
+            <DataGrid Name="DataGrid"
+                      Grid.Column="1"
+                      ItemsSource="{Binding Credentials}"
+                      AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <!-- ID 列（読み取り専用） -->
+                    <DataGridTextColumn Header="ID"
+                                        Binding="{Binding Id}"
+                                        Width="50"
+                                        IsReadOnly="True"/>
+                    <!-- LoginId 列 -->
+                    <DataGridTextColumn Header="Login"
+                                        Binding="{Binding LoginId}"
+                                        Width="2*"/>
+                    <!-- Password 列（暗号化された文字列、または復号されたパスワード） -->
+                    <DataGridTextColumn Header="Password"
+                                        Binding="{Binding Password}"
+                                        Width="2*"/>
+                    <!-- Category 列 -->
+                    <DataGridTextColumn Header="Category"
+                                        Binding="{Binding Category}"
+                                        Width="*"/>
+                    <!-- Tags 列（カンマ区切りのタグ文字列） -->
+                    <DataGridTextColumn Header="Tags"
+                                        Binding="{Binding Tags}"
+                                        Width="2*"/>
+                    <!-- Description 列（用途やメモなどの説明） -->
+                    <DataGridTextColumn Header="Description"
+                                        Binding="{Binding Description}"
+                                        Width="3*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <!-- 下部の操作ボタン群：新規、編集、削除、コピー、マスター設定、エクスポート、インポート -->
+        <StackPanel DockPanel.Dock="Bottom"
+                    Orientation="Horizontal"
+                    Spacing="8"
+                    Margin="0,8,0,0">
+
+            <!-- 新規レコード作成ボタン（コードビハインドで Click をハンドル） -->
+            <Button Name="NewBtn"
+                    Content="New"
+                    Width="90"/>
+
+            <!-- 選択行を編集するボタン -->
+            <Button Name="EditBtn"
+                    Content="Edit Selected"
+                    Width="120"/>
+
+            <!-- 選択行を削除するボタン -->
+            <Button Name="DeleteBtn"
+                    Content="Delete Selected"
+                    Width="120"/>
+
+            <!-- 選択行のパスワードをクリップボードへコピーするボタン -->
+            <Button Name="CopyBtn"
+                    Content="Copy Password"
+                    Width="120"/>
+
+            <!-- マスターパスワードを設定／変更するボタン -->
+            <Button Name="SetMasterBtn"
+                    Content="Set Master Password"
+                    Width="180"/>
+
+            <!-- バックアップファイルへのエクスポートボタン -->
+            <Button Name="ExportBtn"
+                    Content="Export Backup"
+                    Width="140"/>
+
+            <!-- バックアップファイルからのインポートボタン -->
+            <Button Name="ImportBtn"
+                    Content="Import Backup"
+                    Width="140"/>
+        </StackPanel>
+    </DockPanel>
 </Window>
