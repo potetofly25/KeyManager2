@@ -5,68 +5,68 @@ using System.Text;
 namespace potetofly25.KeyManager2.Services
 {
     /// <summary>
-    /// �����_���ȃp�X���[�h������𐶐�����T�[�r�X�N���X�ł��B
-    /// �p�啶���E�p�������E�����E�L���̗��p�L���ƒ������w�肵�ăp�X���[�h�𐶐����܂��B
+    /// ランダムなパスワード文字列を生成するサービスクラスです。
+    /// 英大文字・英小文字・数字・記号の利用有無と長さを指定してパスワードを生成します。
     /// </summary>
     public class PasswordGeneratorService
     {
         /// <summary>
-        /// ���p�\�ȉp�啶���̕����W���ł��B
+        /// 利用可能な英大文字の文字集合です。
         /// </summary>
         private const string Upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
         /// <summary>
-        /// ���p�\�ȉp�������̕����W���ł��B
+        /// 利用可能な英小文字の文字集合です。
         /// </summary>
         private const string Lower = "abcdefghijklmnopqrstuvwxyz";
 
         /// <summary>
-        /// ���p�\�Ȑ����̕����W���ł��B
+        /// 利用可能な数字の文字集合です。
         /// </summary>
         private const string Digits = "0123456789";
 
         /// <summary>
-        /// ���p�\�ȋL���̕����W���ł��B
+        /// 利用可能な記号の文字集合です。
         /// </summary>
         private const string Symbols = "!@#$%^&*()-_=+[]{};:,.<>/?";
 
         /// <summary>
-        /// �^������������B
-        /// ��ʓI�ȗp�r�ł͏\���ł����A�Í��_�I�ɋ��������ł͂���܂���B
+        /// 疑似乱数生成器。
+        /// 一般的な用途では十分ですが、暗号論的に強い乱数ではありません。
         /// </summary>
         private readonly Random _rnd = new();
 
         /// <summary>
-        /// �w�肳�ꂽ�����Ə����Ɋ�Â��A�����_���ȃp�X���[�h�𐶐����܂��B
+        /// 指定された長さと条件に基づき、ランダムなパスワードを生成します。
         /// </summary>
-        /// <param name="length">��������p�X���[�h�̒����B</param>
-        /// <param name="useUpper">�p�啶�����g�p����ꍇ�� true�B</param>
-        /// <param name="useLower">�p���������g�p����ꍇ�� true�B</param>
-        /// <param name="useDigits">�������g�p����ꍇ�� true�B</param>
-        /// <param name="useSymbols">�L�����g�p����ꍇ�� true�B</param>
-        /// <returns>�������ꂽ�p�X���[�h������B</returns>
+        /// <param name="length">生成するパスワードの長さ。</param>
+        /// <param name="useUpper">英大文字を使用する場合は true。</param>
+        /// <param name="useLower">英小文字を使用する場合は true。</param>
+        /// <param name="useDigits">数字を使用する場合は true。</param>
+        /// <param name="useSymbols">記号を使用する場合は true。</param>
+        /// <returns>生成されたパスワード文字列。</returns>
         /// <remarks>
-        /// ���ׂẴt���O�� false �̏ꍇ�́A�t�H�[���o�b�N�Ƃ��ĉp�������݂̂��g�p���Đ������܂��B
-        /// �Í��_�I�ȋ��x�������ɕK�v�ȏꍇ�� <see cref="System.Security.Cryptography.RandomNumberGenerator"/> �̗��p���������Ă��������B
+        /// すべてのフラグが false の場合は、フォールバックとして英小文字のみを使用して生成します。
+        /// 暗号論的な強度が厳密に必要な場合は <see cref="System.Security.Cryptography.RandomNumberGenerator"/> の利用を検討してください。
         /// </remarks>
         public string Generate(int length, bool useUpper = true, bool useLower = true, bool useDigits = true, bool useSymbols = true)
         {
-            // �g�p���镶������r���h����o�b�t�@
+            // 使用する文字種をビルドするバッファ
             var pool = new StringBuilder();
 
-            // �e�t���O�ɉ����ĕ����W����ǉ�
+            // 各フラグに応じて文字集合を追加
             if (useUpper) pool.Append(Upper);
             if (useLower) pool.Append(Lower);
             if (useDigits) pool.Append(Digits);
             if (useSymbols) pool.Append(Symbols);
 
-            // ���ۂɗ��p���镶���v�[��
+            // 実際に利用する文字プール
             var p = pool.ToString();
 
-            // ���ׂẴt���O�� false �̏ꍇ�͉p�������݂̂��g�p����t�H�[���o�b�N
+            // すべてのフラグが false の場合は英小文字のみを使用するフォールバック
             if (string.IsNullOrEmpty(p)) p = Lower;
 
-            // �w�肳�ꂽ���������������_���ɕ�����I�����ăp�X���[�h�𐶐�
+            // 指定された長さ分だけランダムに文字を選択してパスワードを生成
             return new string(
                 [.. Enumerable.Range(0, length).Select(_ => p[_rnd.Next(p.Length)])]);
         }

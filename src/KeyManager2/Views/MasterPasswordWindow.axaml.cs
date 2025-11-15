@@ -4,29 +4,29 @@ using potetofly25.KeyManager2.ViewModels;
 namespace potetofly25.KeyManager2.Views
 {
     /// <summary>
-    /// �}�X�^�[�p�X���[�h���́E�ݒ�p�̃_�C�A���O�E�B���h�E�ł��B
-    /// <see cref="MasterPasswordViewModel"/> �� DataContext �Ƃ��ăo�C���h���A
-    /// ���[�U�[����}�X�^�[�p�X���[�h���擾���܂��B
+    /// マスターパスワード入力・設定用のダイアログウィンドウです。
+    /// <see cref="MasterPasswordViewModel"/> を DataContext としてバインドし、
+    /// ユーザーからマスターパスワードを取得します。
     /// </summary>
     public partial class MasterPasswordWindow : Window
     {
         /// <summary>
-        /// ���̃E�B���h�E�Ƀo�C���h����Ă��� <see cref="MasterPasswordViewModel"/> ���擾���܂��B
-        /// DataContext �� <see cref="MasterPasswordViewModel"/> �łȂ��ꍇ�� null ��Ԃ��܂��B
+        /// このウィンドウにバインドされている <see cref="MasterPasswordViewModel"/> を取得します。
+        /// DataContext が <see cref="MasterPasswordViewModel"/> でない場合は null を返します。
         /// </summary>
         public MasterPasswordViewModel ViewModel => DataContext as MasterPasswordViewModel;
 
         /// <summary>
-        /// <see cref="MasterPasswordWindow"/> �̐V�����C���X�^���X�����������܂��B
-        /// �R���|�[�l���g��������A���̃E�B���h�E���g�������Ƃ���
-        /// <see cref="MasterPasswordViewModel"/> �𐶐����ADataContext �ɐݒ肵�܂��B
+        /// <see cref="MasterPasswordWindow"/> の新しいインスタンスを初期化します。
+        /// コンポーネント初期化後、このウィンドウ自身を引数として
+        /// <see cref="MasterPasswordViewModel"/> を生成し、DataContext に設定します。
         /// </summary>
         public MasterPasswordWindow()
         {
-            // XAML �ɒ�`���ꂽ UI �R���|�[�l���g��������
+            // XAML に定義された UI コンポーネントを初期化
             InitializeComponent();
 
-            // ���̃E�B���h�E���󂯎�� ViewModel �𐶐����� DataContext �ɐݒ�
+            // このウィンドウを受け取る ViewModel を生成して DataContext に設定
             DataContext = new MasterPasswordViewModel(this);
         }
     }

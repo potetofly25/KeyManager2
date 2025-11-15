@@ -3,52 +3,52 @@ using System.ComponentModel.DataAnnotations;
 namespace potetofly25.KeyManager2.Models
 {
     /// <summary>
-    /// �F�؏��i���O�C��ID�A�p�X���[�h�A�����A���ނȂǁj��\�����f���N���X�B
-    /// ���̃G���e�B�e�B�� SQLite �f�[�^�x�[�X�� Credential �e�[�u���փ}�b�s���O����܂��B
+    /// 認証情報（ログインID、パスワード、説明、分類など）を表すモデルクラス。
+    /// このエンティティは SQLite データベースの Credential テーブルへマッピングされます。
     /// </summary>
     public class Credential
     {
         /// <summary>
-        /// ��L�[��\�����ʎq�B
-        /// �����I�ɃC���N�������g������ӂ̐����l�ł��B
+        /// 主キーを表す識別子。
+        /// 自動的にインクリメントされる一意の整数値です。
         /// </summary>
         [Key]
         public int Id { get; set; }
 
         /// <summary>
-        /// �F�؂Ɏg�p���郍�O�C��ID�B
-        /// Web �T�C�g�A�A�v���P�[�V�����A�T�[�r�X�Ȃǂŗ��p�����A�J�E���g�����i�[���܂��B
+        /// 認証に使用するログインID。
+        /// Web サイト、アプリケーション、サービスなどで利用されるアカウント名を格納します。
         /// </summary>
         public string LoginId { get; set; } = string.Empty;
 
         /// <summary>
-        /// �F�؂Ɏg�p����p�X���[�h�B
-        /// �K�v�ɉ����ĈÍ�������ĕۑ�����܂��B
+        /// 認証に使用するパスワード。
+        /// 必要に応じて暗号化されて保存されます。
         /// </summary>
         public string Password { get; set; } = string.Empty;
 
         /// <summary>
-        /// �F�؏��Ɋւ���������B
-        /// ������p�r�Ȃǂ̎��R�L�q���Ƃ��Ďg�p�ł��܂��B
+        /// 認証情報に関する説明文。
+        /// メモや用途などの自由記述欄として使用できます。
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// �F�؏��̕��ރJ�e�S���B
-        /// Web �T�[�r�X�A�A�v���A�Ɩ��A�l���p�ȂǔC�ӂ̗p�r�ɕ��ނ��邽�߂ɗ��p���܂��B
+        /// 認証情報の分類カテゴリ。
+        /// Web サービス、アプリ、業務、個人利用など任意の用途に分類するために利用します。
         /// </summary>
         public string? Category { get; set; }
 
         /// <summary>
-        /// �F�؏��ɕt�^����^�O�ꗗ�B
-        /// �J���}��؂�ŕ����^�O���w��ł��܂��B
-        /// ��: "�d��,��s,�l"
+        /// 認証情報に付与するタグ一覧。
+        /// カンマ区切りで複数タグを指定できます。
+        /// 例: "仕事,銀行,個人"
         /// </summary>
-        public string? Tags { get; set; } // �J���}��؂�ŕ����^�O���i�[
+        public string? Tags { get; set; } // カンマ区切りで複数タグを格納
 
         /// <summary>
-        /// �p�X���[�h�Ȃǂ̃f�[�^���Í�������Ă��邩�ǂ����̃t���O�B
-        /// �Í����ς݂̏ꍇ�� true�A�����̏ꍇ�� false �������܂��B
+        /// パスワードなどのデータが暗号化されているかどうかのフラグ。
+        /// 暗号化済みの場合は true、平文の場合は false を示します。
         /// </summary>
         public bool IsEncrypted { get; set; } = false;
     }

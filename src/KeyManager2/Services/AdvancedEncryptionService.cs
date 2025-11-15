@@ -7,97 +7,97 @@ using System.Text;
 namespace potetofly25.KeyManager2.Services
 {
     /// <summary>
-    /// �}�X�^�[�p�X���[�h��p�������x�ȈÍ����E������񋟂���T�[�r�X�N���X�ł��B
-    /// ���[�g���irootKey�j���}�X�^�[�p�X���[�h�Ń��b�v���Ĉ��S�ɕۑ����A
-    /// ���̃��[�g������h���������T�u�L�[�ŃA�v�����̔閧�����Í����E�������܂��B
+    /// マスターパスワードを用いた高度な暗号化・復号を提供するサービスクラスです。
+    /// ルート鍵（rootKey）をマスターパスワードでラップして安全に保存し、
+    /// そのルート鍵から派生させたサブキーでアプリ内の秘密情報を暗号化・復号します。
     /// </summary>
     public static class AdvancedEncryptionService
     {
         /// <summary>
-        /// �Í����̃o�C�g���i32 �o�C�g = 256bit�j��\���܂��B
+        /// 暗号鍵のバイト長（32 バイト = 256bit）を表します。
         /// </summary>
         private const int KeyBytes = 32;
 
         /// <summary>
-        /// �p�X���[�h���o�ɗp����\���g�̃o�C�g���i32 �o�C�g�j��\���܂��B
+        /// パスワード導出に用いるソルトのバイト長（32 バイト）を表します。
         /// </summary>
         private const int SaltBytes = 32;
 
         /// <summary>
-        /// PBKDF2 �ɂ�錮���o�̔����񐔂ł��B���������񐔂ɂ�葍������U���ɑ΂��ċ������܂��B
+        /// PBKDF2 による鍵導出の反復回数です。高い反復回数により総当たり攻撃に対して強くします。
         /// </summary>
         private const int Iterations = 200_000;
 
         /// <summary>
-        /// AES-GCM ���g�p����F�؃^�O�̒����i16 �o�C�g�j��\���܂��B
+        /// AES-GCM が使用する認証タグの長さ（16 バイト）を表します。
         /// </summary>
         private const int GcmTagLength = 16;
 
         /// <summary>
-        /// �p�X���[�h���o�p�\���g��ۑ�����t�@�C���p�X�ł��B
+        /// パスワード導出用ソルトを保存するファイルパスです。
         /// </summary>
         private static readonly string SaltFile = Path.Combine(Directory.GetCurrentDirectory(), "KeyManager2_adv.salt");
 
         /// <summary>
-        /// �}�X�^�[�p�X���[�h�Ń��b�v���ꂽ���[�g����ۑ�����t�@�C���p�X�ł��B
+        /// マスターパスワードでラップされたルート鍵を保存するファイルパスです。
         /// </summary>
         private static readonly string WrappedRootKeyFile = Path.Combine(Directory.GetCurrentDirectory(), "KeyManager2_root.wrapped");
 
         /// <summary>
-        /// ��������ɓW�J���ꂽ���[�g����ێ�����t�B�[���h�ł��B
-        /// �}�X�^�[�p�X���[�h���ݒ�ς݂��ǂ����̔���ɂ��g�p����܂��B
+        /// メモリ上に展開されたルート鍵を保持するフィールドです。
+        /// マスターパスワードが設定済みかどうかの判定にも使用されます。
         /// </summary>
         private static byte[]? _rootKey;
 
         /// <summary>
-        /// �}�X�^�[�p�X���[�h���ݒ�E�W�J����A���[�g������������ɑ��݂��邩�ǂ����������t���O�ł��B
+        /// マスターパスワードが設定・展開され、ルート鍵がメモリ上に存在するかどうかを示すフラグです。
         /// </summary>
         public static bool IsMasterSet => _rootKey != null;
 
         /// <summary>
-        /// �\���g�i�p�X���[�h���献�𓱏o����ۂɎg�p���郉���_���o�C�g��j���m�ۂ��܂��B
-        /// �����̃\���g�t�@�C��������ꍇ�͂�������ǂݍ��݁A�Ȃ���ΐV���ɐ����E�ۑ����܂��B
+        /// ソルト（パスワードから鍵を導出する際に使用するランダムバイト列）を確保します。
+        /// 既存のソルトファイルがある場合はそこから読み込み、なければ新たに生成・保存します。
         /// </summary>
-        /// <returns>�\���g�̃o�C�g�z��B</returns>
+        /// <returns>ソルトのバイト配列。</returns>
         private static byte[] EnsureSalt()
         {
-            // ���Ƀ\���g�t�@�C�������݂���ꍇ�͍ė��p����
+            // 既にソルトファイルが存在する場合は再利用する
             if (File.Exists(SaltFile))
             {
                 return File.ReadAllBytes(SaltFile);
             }
 
-            // �V���Ƀ\���g�𐶐�
+            // 新たにソルトを生成
             var s = new byte[SaltBytes];
             RandomNumberGenerator.Fill(s);
 
-            // �\���g���t�@�C���ɕۑ�
+            // ソルトをファイルに保存
             File.WriteAllBytes(SaltFile, s);
 
             return s;
         }
 
         /// <summary>
-        /// ����Z�b�g�A�b�v�p�Ƀ}�X�^�[�p�X���[�h���g�p���ĐV�������[�g���𐶐����A
-        /// ���̃��[�g�����p�X���[�h�Ń��b�v���ĉi�������܂��B
-        /// Windows ���ł� DPAPI (ProtectedData) �ɂ��ǉ��ی�����݂܂��B
+        /// 初回セットアップ用にマスターパスワードを使用して新しいルート鍵を生成し、
+        /// そのルート鍵をパスワードでラップして永続化します。
+        /// Windows 環境では DPAPI (ProtectedData) による追加保護も試みます。
         /// </summary>
-        /// <param name="masterPassword">�}�X�^�[�p�X���[�h�ƂȂ镶����B</param>
+        /// <param name="masterPassword">マスターパスワードとなる文字列。</param>
         public static void InitializeMasterPassword(string masterPassword)
         {
-            // ���[�g���𐶐��i���S�����_���� 32 �o�C�g�j
+            // ルート鍵を生成（完全ランダムな 32 バイト）
             var root = new byte[KeyBytes];
             RandomNumberGenerator.Fill(root);
 
-            // ���[�g�����}�X�^�[�p�X���[�h�Ń��b�v�i�Í����j����
+            // ルート鍵をマスターパスワードでラップ（暗号化）する
             var wrapped = WrapRootKeyWithPassword(root, masterPassword);
 
-            // �v���b�g�t�H�[���ŗL�ی�iWindows �� CurrentUser �X�R�[�v�j�����s
+            // プラットフォーム固有保護（Windows の CurrentUser スコープ）を試行
             try
             {
                 if (OperatingSystem.IsWindows())
                 {
-                    // DPAPI �ɂ��ǉ��ی�
+                    // DPAPI による追加保護
                     var protectedBytes = ProtectedData.Protect(wrapped, null, DataProtectionScope.CurrentUser);
                     File.WriteAllBytes(WrappedRootKeyFile, protectedBytes);
                     _rootKey = root;
@@ -106,35 +106,35 @@ namespace potetofly25.KeyManager2.Services
             }
             catch
             {
-                // ���s�����ꍇ�� DPAPI �ی�Ȃ��ŕۑ�����i�t�H�[���o�b�N�j
+                // 失敗した場合は DPAPI 保護なしで保存する（フォールバック）
             }
 
-            // �W���I�ȃ��b�v�f�[�^�����̂܂ܕۑ�
+            // 標準的なラップデータをそのまま保存
             File.WriteAllBytes(WrappedRootKeyFile, wrapped);
 
-            // ��������Ƀ��[�g����ێ�
+            // メモリ上にルート鍵を保持
             _rootKey = root;
         }
 
         /// <summary>
-        /// �����̃��b�v�ς݃��[�g�����}�X�^�[�p�X���[�h�ŕ������A
-        /// ��������Ƀ��[�g����W�J���܂��B
+        /// 既存のラップ済みルート鍵をマスターパスワードで復号し、
+        /// メモリ上にルート鍵を展開します。
         /// </summary>
-        /// <param name="masterPassword">�ۑ����Ɠ����}�X�^�[�p�X���[�h�B</param>
-        /// <exception cref="InvalidOperationException">���b�v���ꂽ���[�g���t�@�C�������݂��Ȃ��ꍇ�ɃX���[����܂��B</exception>
-        /// <exception cref="CryptographicException">�p�X���[�h������Ă���Ȃǂŕ����Ɏ��s�����ꍇ�ɃX���[����܂��B</exception>
+        /// <param name="masterPassword">保存時と同じマスターパスワード。</param>
+        /// <exception cref="InvalidOperationException">ラップされたルート鍵ファイルが存在しない場合にスローされます。</exception>
+        /// <exception cref="CryptographicException">パスワードが誤っているなどで復号に失敗した場合にスローされます。</exception>
         public static void SetMasterPassword(string masterPassword)
         {
-            // ���b�v�ς݃��[�g���t�@�C�����Ȃ��ꍇ�͏���������Ă��Ȃ�
+            // ラップ済みルート鍵ファイルがない場合は初期化されていない
             if (!File.Exists(WrappedRootKeyFile))
             {
                 throw new InvalidOperationException("No wrapped root key stored.");
             }
 
-            // �t�@�C�����烉�b�v�ς݃f�[�^��ǂݍ���
+            // ファイルからラップ済みデータを読み込み
             var wrapped = File.ReadAllBytes(WrappedRootKeyFile);
 
-            // Windows ���� DPAPI �ی삳��Ă���Ή��������݂�
+            // Windows 環境で DPAPI 保護されていれば解除を試みる
             try
             {
                 if (OperatingSystem.IsWindows())
@@ -145,23 +145,23 @@ namespace potetofly25.KeyManager2.Services
             }
             catch
             {
-                // DPAPI �����Ɏ��s���Ă��A���̂܂� wrapped ��p���ĕ��������݂�
+                // DPAPI 解除に失敗しても、そのまま wrapped を用いて復号を試みる
             }
 
-            // �}�X�^�[�p�X���[�h�Ń��[�g���𕜍�
+            // マスターパスワードでルート鍵を復号
             var root = UnwrapRootKeyWithPassword(wrapped, masterPassword);
 
-            // �����ɐ����������[�g������������ɕێ�
+            // 復号に成功したルート鍵をメモリ上に保持
             _rootKey = root;
         }
 
         /// <summary>
-        /// ��������ɕێ����Ă��郋�[�g����j�����A�}�X�^�[�p�X���[�h�̏�Ԃ��N���A���܂��B
-        /// ���ۂ̃t�@�C���͍폜�����A�ēx SetMasterPassword ���ĂԂ��Ƃŕ����\�ł��B
+        /// メモリ上に保持しているルート鍵を破棄し、マスターパスワードの状態をクリアします。
+        /// 実際のファイルは削除せず、再度 SetMasterPassword を呼ぶことで復元可能です。
         /// </summary>
         public static void ClearMasterPassword()
         {
-            // ���[�g�����m�ۍς݂Ȃ�[���N���A���Ă���Q�Ƃ�j��
+            // ルート鍵が確保済みならゼロクリアしてから参照を破棄
             if (_rootKey != null)
             {
                 Array.Clear(_rootKey, 0, _rootKey.Length);
@@ -170,35 +170,35 @@ namespace potetofly25.KeyManager2.Services
         }
 
         /// <summary>
-        /// ���[�g�����}�X�^�[�p�X���[�h�Ń��b�v�i�Í����j���܂��B
-        /// PBKDF2 �ɂ���ē��o���ꂽ�����g�p���AAES-GCM �Ń��[�g����ی삵�܂��B
+        /// ルート鍵をマスターパスワードでラップ（暗号化）します。
+        /// PBKDF2 によって導出された鍵を使用し、AES-GCM でルート鍵を保護します。
         /// </summary>
-        /// <param name="rootKey">���b�v�Ώۂ̃��[�g���o�C�g��B</param>
-        /// <param name="password">�}�X�^�[�p�X���[�h�B</param>
-        /// <returns>�\���g�AIV�A�Í����f�[�^�A�^�O��A���������b�v�ς݃o�C�g��B</returns>
+        /// <param name="rootKey">ラップ対象のルート鍵バイト列。</param>
+        /// <param name="password">マスターパスワード。</param>
+        /// <returns>ソルト、IV、暗号化データ、タグを連結したラップ済みバイト列。</returns>
         private static byte[] WrapRootKeyWithPassword(byte[] rootKey, string password)
         {
-            // �\���g���擾�i���� or �V�K�j
+            // ソルトを取得（既存 or 新規）
             var salt = EnsureSalt();
 
-            // PBKDF2 �ɂ��p�X���[�h���� 32 �o�C�g�̌��𓱏o
+            // PBKDF2 によりパスワードから 32 バイトの鍵を導出
             using var derive = new Rfc2898DeriveBytes(password ?? string.Empty, salt, Iterations, HashAlgorithmName.SHA256);
             var key = derive.GetBytes(KeyBytes);
 
-            // AES-GCM �p IV�i12 �o�C�g�j�𐶐�
+            // AES-GCM 用 IV（12 バイト）を生成
             var iv = RandomNumberGenerator.GetBytes(12);
 
-            // �Í����ƃ^�O�̃o�b�t�@���m��
+            // 暗号文とタグのバッファを確保
             var cipher = new byte[rootKey.Length];
             var tag = new byte[GcmTagLength];
 
-            // AES-GCM �Ń��[�g�����Í���
+            // AES-GCM でルート鍵を暗号化
             using (var aes = new AesGcm(key, GcmTagLength))
             {
                 aes.Encrypt(iv, rootKey, cipher, tag);
             }
 
-            // �\���g + IV + �Í��f�[�^ + �^�O��A�����ă��b�v�ς݃f�[�^���\��
+            // ソルト + IV + 暗号データ + タグを連結してラップ済みデータを構成
             var wrapped = new byte[salt.Length + iv.Length + cipher.Length + tag.Length];
             Buffer.BlockCopy(salt, 0, wrapped, 0, salt.Length);
             Buffer.BlockCopy(iv, 0, wrapped, salt.Length, iv.Length);
@@ -209,16 +209,16 @@ namespace potetofly25.KeyManager2.Services
         }
 
         /// <summary>
-        /// �}�X�^�[�p�X���[�h��p���ă��b�v�ς݃��[�g���𕜍����܂��B
-        /// ���b�v���ɘA�����ꂽ�\���g�AIV�A�Í��f�[�^�A�^�O���猳�̃��[�g�������o���܂��B
+        /// マスターパスワードを用いてラップ済みルート鍵を復号します。
+        /// ラップ時に連結されたソルト、IV、暗号データ、タグから元のルート鍵を取り出します。
         /// </summary>
-        /// <param name="wrapped">�\���g�AIV�A�Í��f�[�^�A�^�O���A�����ꂽ���b�v�ς݃f�[�^�B</param>
-        /// <param name="password">�}�X�^�[�p�X���[�h�B</param>
-        /// <returns>�������ꂽ���[�g���̃o�C�g�z��B</returns>
-        /// <exception cref="CryptographicException">�p�X���[�h�s��v�Ȃǂŕ����Ɏ��s�����ꍇ�ɃX���[����܂��B</exception>
+        /// <param name="wrapped">ソルト、IV、暗号データ、タグが連結されたラップ済みデータ。</param>
+        /// <param name="password">マスターパスワード。</param>
+        /// <returns>復号されたルート鍵のバイト配列。</returns>
+        /// <exception cref="CryptographicException">パスワード不一致などで復号に失敗した場合にスローされます。</exception>
         private static byte[] UnwrapRootKeyWithPassword(byte[] wrapped, string password)
         {
-            // �擪����\���g�AIV�A��������^�O�����o���A�c����Í��f�[�^�Ƃ݂Ȃ�
+            // 先頭からソルト、IV、末尾からタグを取り出し、残りを暗号データとみなす
             var salt = wrapped.Take(SaltBytes).ToArray();
             var iv = wrapped.Skip(SaltBytes).Take(12).ToArray();
             var tag = wrapped.Skip(wrapped.Length - GcmTagLength).Take(GcmTagLength).ToArray();
@@ -226,14 +226,14 @@ namespace potetofly25.KeyManager2.Services
                                 .Take(wrapped.Length - SaltBytes - iv.Length - tag.Length)
                                 .ToArray();
 
-            // PBKDF2 �ɂ��p�X���[�h���献�𓱏o
+            // PBKDF2 によりパスワードから鍵を導出
             using var derive = new Rfc2898DeriveBytes(password ?? string.Empty, salt, Iterations, HashAlgorithmName.SHA256);
             var key = derive.GetBytes(KeyBytes);
 
-            // ������o�b�t�@������
+            // 復号先バッファを準備
             var root = new byte[cipher.Length];
 
-            // AES-GCM �ɂ�镜��
+            // AES-GCM による復号
             using (var aes = new AesGcm(key, GcmTagLength))
             {
                 aes.Decrypt(iv, cipher, tag, root);
@@ -243,71 +243,71 @@ namespace potetofly25.KeyManager2.Services
         }
 
         /// <summary>
-        /// ���[�g������Í����p�T�u�L�[�� HMAC �p�T�u�L�[��h�������܂��B
-        /// HMAC-SHA256 �𗘗p���A���ꂼ��قȂ� info �l�i"enc", "hmac"�j��p���� HKDF ���̏����ł��B
+        /// ルート鍵から暗号化用サブキーと HMAC 用サブキーを派生させます。
+        /// HMAC-SHA256 を利用し、それぞれ異なる info 値（"enc", "hmac"）を用いた HKDF 風の処理です。
         /// </summary>
-        /// <param name="root">�T�u�L�[�̌��ƂȂ郋�[�g���B</param>
-        /// <returns>�Í����p���� HMAC �p�����܂ރ^�v���B</returns>
+        /// <param name="root">サブキーの元となるルート鍵。</param>
+        /// <returns>暗号化用鍵と HMAC 用鍵を含むタプル。</returns>
         private static (byte[] encKey, byte[] hmacKey) DeriveSubKeys(byte[] root)
         {
-            // �������[�J���֐��F�w�肳�ꂽ info ��p���� HMAC-SHA256 ���v�Z���A32 �o�C�g���T�u�L�[�Ƃ���
+            // 内部ローカル関数：指定された info を用いて HMAC-SHA256 を計算し、32 バイトをサブキーとする
             byte[] Derive(byte[] info)
             {
                 using var hmac = new HMACSHA256(root);
                 return [.. hmac.ComputeHash(info).Take(KeyBytes)];
             }
 
-            // �Í����p�T�u�L�[�iinfo="enc"�j
+            // 暗号化用サブキー（info="enc"）
             var encKey = Derive(Encoding.UTF8.GetBytes("enc"));
 
-            // HMAC �p�T�u�L�[�iinfo="hmac"�j
+            // HMAC 用サブキー（info="hmac"）
             var hmacKey = Derive(Encoding.UTF8.GetBytes("hmac"));
 
             return (encKey, hmacKey);
         }
 
         /// <summary>
-        /// ���ݐݒ肳��Ă���}�X�^�[�p�X���[�h�i���[�g���j���g�p���āA
-        /// �w�肳�ꂽ������������Í������ABase64 ������Ƃ��ĕԂ��܂��B
-        /// AES-GCM �ɂ��F�ؕt���Í��� HMAC �ɂ�銮�S�����ؗp�^�O��g�ݍ��킹�Ă��܂��B
+        /// 現在設定されているマスターパスワード（ルート鍵）を使用して、
+        /// 指定された平文文字列を暗号化し、Base64 文字列として返します。
+        /// AES-GCM による認証付き暗号と HMAC による完全性検証用タグを組み合わせています。
         /// </summary>
-        /// <param name="plain">�Í�������������������B</param>
-        /// <returns>�Í������ꂽ�f�[�^��\�� Base64 ������B</returns>
-        /// <exception cref="InvalidOperationException">�}�X�^�[�p�X���[�h�i���[�g���j�����ݒ�̏ꍇ�ɃX���[����܂��B</exception>
+        /// <param name="plain">暗号化したい平文文字列。</param>
+        /// <returns>暗号化されたデータを表す Base64 文字列。</returns>
+        /// <exception cref="InvalidOperationException">マスターパスワード（ルート鍵）が未設定の場合にスローされます。</exception>
         public static string EncryptString(string plain)
         {
-            // ���[�g������������ɑ��݂��Ȃ��ꍇ�́A�}�X�^�[�p�X���[�h���ݒ肳��Ă��Ȃ�
+            // ルート鍵がメモリ上に存在しない場合は、マスターパスワードが設定されていない
             if (_rootKey == null)
             {
                 throw new InvalidOperationException("Master not set.");
             }
 
-            // ���[�g������Í����p���� HMAC �p����h��
+            // ルート鍵から暗号化用鍵と HMAC 用鍵を派生
             var (encKey, hmacKey) = DeriveSubKeys(_rootKey);
 
-            // ������ UTF-8 �o�C�g��֕ϊ�
+            // 平文を UTF-8 バイト列へ変換
             var plainBytes = Encoding.UTF8.GetBytes(plain ?? string.Empty);
 
-            // AES-GCM �p IV �𐶐�
+            // AES-GCM 用 IV を生成
             var iv = RandomNumberGenerator.GetBytes(12);
 
-            // �Í��f�[�^����у^�O�̃o�b�t�@������
+            // 暗号データおよびタグのバッファを準備
             var cipher = new byte[plainBytes.Length];
             var tag = new byte[GcmTagLength];
 
-            // AES-GCM �ɂ��Í���
+            // AES-GCM による暗号化
             using (var aes = new AesGcm(encKey, GcmTagLength))
             {
                 aes.Encrypt(iv, plainBytes, cipher, tag);
             }
 
-            // iv + cipher + tag ���y�C���[�h�Ƃ��ĘA��
+            // iv + cipher + tag をペイロードとして連結
             var payload = new byte[iv.Length + cipher.Length + tag.Length];
             Buffer.BlockCopy(iv, 0, payload, 0, iv.Length);
             Buffer.BlockCopy(cipher, 0, payload, iv.Length, cipher.Length);
             Buffer.BlockCopy(tag, 0, payload, iv.Length + cipher.Length, tag.Length);
 
-            // �y�C���[�h�ɑ΂��� HMAC ���v�Z���A�����ɘA��
+            // ペイロードに対して HMAC を計算し、末尾に連結
             byte[] hmac;
             using (var mac = new HMACSHA256(hmacKey))
             {
@@ -318,72 +318,72 @@ namespace potetofly25.KeyManager2.Services
             Buffer.BlockCopy(payload, 0, full, 0, payload.Length);
             Buffer.BlockCopy(hmac, 0, full, payload.Length, hmac.Length);
 
-            // ���������o�C�g��� Base64 ������Ƃ��ĕԋp
+            // 完成したバイト列を Base64 文字列として返却
             return Convert.ToBase64String(full);
         }
 
         /// <summary>
-        /// ���ݐݒ肳��Ă���}�X�^�[�p�X���[�h�i���[�g���j���g�p���āA
-        /// EncryptString �ɂ���Đ������ꂽ Base64 ������𕜍����A���̕����������Ԃ��܂��B
-        /// HMAC �ɂ�銮�S���`�F�b�N�ƁAAES-GCM �̔F�؃^�O���؂��s���܂��B
+        /// 現在設定されているマスターパスワード（ルート鍵）を使用して、
+        /// EncryptString によって生成された Base64 文字列を復号し、元の平文文字列を返します。
+        /// HMAC による完全性チェックと、AES-GCM の認証タグ検証を行います。
         /// </summary>
-        /// <param name="b64">�Í����ς݃f�[�^��\�� Base64 ������B</param>
-        /// <returns>�������ꂽ����������B</returns>
-        /// <exception cref="InvalidOperationException">�}�X�^�[�p�X���[�h�i���[�g���j�����ݒ�̏ꍇ�ɃX���[����܂��B</exception>
+        /// <param name="b64">暗号化済みデータを表す Base64 文字列。</param>
+        /// <returns>復号された平文文字列。</returns>
+        /// <exception cref="InvalidOperationException">マスターパスワード（ルート鍵）が未設定の場合にスローされます。</exception>
         /// <exception cref="CryptographicException">
-        /// �f�[�^�`�����s���AHMAC ���؎��s�AAES-GCM �̕������s�ȂǁA�Í��I�Ȑ����������Ȃ��ꍇ�ɃX���[����܂��B
+        /// データ形式が不正、HMAC 検証失敗、AES-GCM の復号失敗など、暗号的な整合性が取れない場合にスローされます。
         /// </exception>
         public static string DecryptString(string b64)
         {
-            // ���[�g�������ݒ�̏ꍇ�͕����s��
+            // ルート鍵が未設定の場合は復号不可
             if (_rootKey == null)
             {
                 throw new InvalidOperationException("Master not set.");
             }
 
-            // ���[�g������T�u�L�[��h��
+            // ルート鍵からサブキーを派生
             var (encKey, hmacKey) = DeriveSubKeys(_rootKey);
 
-            // Base64 ��������o�C�g�z��֕ϊ�
+            // Base64 文字列をバイト配列へ変換
             var full = Convert.FromBase64String(b64);
 
-            // �Œ���̒����`�F�b�N�iIV + TAG + HMAC ���𖞂����Ă��邩�j
+            // 最低限の長さチェック（IV + TAG + HMAC 長を満たしているか）
             if (full.Length < 12 + GcmTagLength + 32)
             {
                 throw new CryptographicException("Invalid payload");
             }
 
-            // ���� 32 �o�C�g�� HMAC�A�c����y�C���[�h�Ƃ݂Ȃ�
+            // 末尾 32 バイトを HMAC、残りをペイロードとみなす
             var hmac = full.Skip(full.Length - 32).Take(32).ToArray();
             var payload = full.Take(full.Length - 32).ToArray();
 
-            // HMAC �ɂ�銮�S���`�F�b�N
+            // HMAC による完全性チェック
             using (var mac = new HMACSHA256(hmacKey))
             {
                 var expected = mac.ComputeHash(payload);
 
-                // FixedTimeEquals �ɂ��^�C�~���O�U���΍��t����r
+                // FixedTimeEquals によるタイミング攻撃対策付き比較
                 if (!CryptographicOperations.FixedTimeEquals(expected, hmac))
                 {
                     throw new CryptographicException("HMAC mismatch");
                 }
             }
 
-            // �y�C���[�h���� IV�A�^�O�A�Í��f�[�^�𕪊�
+            // ペイロードから IV、タグ、暗号データを分割
             var iv = payload.Take(12).ToArray();
             var tag = payload.Skip(payload.Length - GcmTagLength).Take(GcmTagLength).ToArray();
             var cipher = payload.Skip(12).Take(payload.Length - 12 - GcmTagLength).ToArray();
 
-            // �����p�o�b�t�@
+            // 復号用バッファ
             var plain = new byte[cipher.Length];
 
-            // AES-GCM �ŕ���
+            // AES-GCM で復号
             using (var aes = new AesGcm(encKey, GcmTagLength))
             {
                 aes.Decrypt(iv, cipher, tag, plain);
             }
 
-            // UTF-8 ������֕ϊ����ĕԋp
+            // UTF-8 文字列へ変換して返却
             return Encoding.UTF8.GetString(plain);
         }
     }

@@ -1,4 +1,4 @@
-<!-- ƒƒCƒ“ƒEƒBƒ“ƒhƒE‚Ì’è‹`FƒAƒvƒŠ‘S‘Ì‚Ìˆê——‰æ–Ê -->
+<!-- ãƒ¡ã‚¤ãƒ³ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å®šç¾©ï¼šã‚¢ãƒ—ãƒªå…¨ä½“ã®ä¸€è¦§ç”»é¢ -->
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,79 +6,136 @@
         xmlns:vm="using:potetofly25.KeyManager2.ViewModels"
         x:Class="potetofly25.KeyManager2.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="KeyManager2" Width="1000" Height="600">
+        Title="KeyManager2" Width="1200" Height="600">
     
-    <!-- ViewModel ‚ð XAML ‘¤‚Å¶¬‚µ‚Ä DataContext ‚ÉÝ’è -->
-    <Window.DataContext>
-        <vm:MainWindowViewModel />
-    </Window.DataContext>
-
-    <!-- ‰æ–Ê‘S‘Ì‚ðƒŒƒCƒAƒEƒg‚·‚é DockPanel -->
+    <!-- ç”»é¢å…¨ä½“ã‚’ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã™ã‚‹ DockPanel -->
     <DockPanel Margin="12">
 
-        <!-- ã•”‚ÌŒŸõƒo[‚ÆƒJƒeƒSƒŠƒtƒBƒ‹ƒ^AƒŠƒtƒŒƒbƒVƒ…ƒ{ƒ^ƒ“ƒGƒŠƒA -->
+        <!-- ä¸Šéƒ¨ã®æ¤œç´¢ãƒãƒ¼ã¨ã‚«ãƒ†ã‚´ãƒªãƒ•ã‚£ãƒ«ã‚¿ã€ãƒªãƒ•ãƒ¬ãƒƒã‚·ãƒ¥ãƒœã‚¿ãƒ³ã‚¨ãƒªã‚¢ -->
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Spacing="8">
-            <!-- ƒeƒLƒXƒgŒŸõƒ{ƒbƒNƒXFSearchText ‚Æ‘o•ûŒüƒoƒCƒ“ƒh -->
+            <!-- ãƒ†ã‚­ã‚¹ãƒˆæ¤œç´¢ãƒœãƒƒã‚¯ã‚¹ï¼šSearchText ã¨åŒæ–¹å‘ãƒã‚¤ãƒ³ãƒ‰ -->
             <TextBox Width="320"
                      Watermark="Search"
                      Text="{Binding SearchText, Mode=TwoWay}"/>
 
-            <!-- ƒJƒeƒSƒŠ‘I‘ðƒRƒ“ƒ{ƒ{ƒbƒNƒXFCategories ‚©‚ç‘I‘ð‚µ SelectedCategory ‚ÉƒoƒCƒ“ƒh -->
+            <!-- ã‚«ãƒ†ã‚´ãƒªé¸æŠžã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹ï¼šCategories ã‹ã‚‰é¸æŠžã— SelectedCategory ã«ãƒã‚¤ãƒ³ãƒ‰ -->
             <ComboBox ItemsSource="{Binding Categories}"
-                      SelectedItem="{Binding SelectedCategory, Mode=TwoWay}">
+                      SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                      MinWidth="150" >
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <!-- ƒJƒeƒSƒŠ–¼‚ð•\Ž¦‚·‚é TextBlocki’Pƒ‚È•¶Žš—ñƒoƒCƒ“ƒhj -->
+                        <!-- ã‚«ãƒ†ã‚´ãƒªåã‚’è¡¨ç¤ºã™ã‚‹ TextBlockï¼ˆå˜ç´”ãªæ–‡å­—åˆ—ãƒã‚¤ãƒ³ãƒ‰ï¼‰ -->
                         <TextBlock Text="{Binding}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
 
-            <!-- Žè“®‚Åˆê——‚ðÄ“Ç‚Ýž‚Ý‚·‚é Refresh ƒ{ƒ^ƒ“ -->
-            <Button Content="Refresh"
-                    Command="{Binding RefreshCommand}" />
+            <!-- æ‰‹å‹•ã§ä¸€è¦§ã‚’å†èª­ã¿è¾¼ã¿ã™ã‚‹ Refresh ãƒœã‚¿ãƒ³ -->
+            <Button Content="æ›´æ–°"
+                    Command="{Binding RefreshCommand}"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Width="120" />
         </StackPanel>
 
-        <!-- ’†‰›ƒGƒŠƒAF¶‘¤‚Éƒ^ƒOƒNƒ‰ƒEƒhA‰E‘¤‚É DataGrid ‚ð”z’u -->
+        <!-- ä¸‹éƒ¨ã®æ“ä½œãƒœã‚¿ãƒ³ç¾¤ï¼šæ–°è¦ã€ç·¨é›†ã€å‰Šé™¤ã€ã‚³ãƒ”ãƒ¼ã€ãƒžã‚¹ã‚¿ãƒ¼è¨­å®šã€ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆã€ã‚¤ãƒ³ãƒãƒ¼ãƒˆ -->
+        <StackPanel DockPanel.Dock="Bottom"
+                    Orientation="Horizontal"
+                    Spacing="8"
+                    Margin="0,8,0,0">
+
+            <!-- æ–°è¦ãƒ¬ã‚³ãƒ¼ãƒ‰ä½œæˆãƒœã‚¿ãƒ³ï¼ˆã‚³ãƒ¼ãƒ‰ãƒ“ãƒã‚¤ãƒ³ãƒ‰ã§ Click ã‚’ãƒãƒ³ãƒ‰ãƒ«ï¼‰ -->
+            <Button Name="NewBtn"
+                    Content="è¿½åŠ "
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Width="120"/>
+
+            <!-- é¸æŠžè¡Œã‚’ç·¨é›†ã™ã‚‹ãƒœã‚¿ãƒ³ -->
+            <Button Name="EditBtn"
+                    Content="é¸æŠžç·¨é›†"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Width="120"/>
+
+            <!-- é¸æŠžè¡Œã‚’å‰Šé™¤ã™ã‚‹ãƒœã‚¿ãƒ³ -->
+            <Button Name="DeleteBtn"
+                    Content="é¸æŠžå‰Šé™¤"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Width="120"/>
+
+            <!-- é¸æŠžè¡Œã®ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã¸ã‚³ãƒ”ãƒ¼ã™ã‚‹ãƒœã‚¿ãƒ³ -->
+            <Button Name="CopyBtn"
+                    Content="ã‚³ãƒ”ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Width="120"/>
+
+            <!-- ãƒžã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’è¨­å®šï¼å¤‰æ›´ã™ã‚‹ãƒœã‚¿ãƒ³ -->
+            <Button Name="SetMasterBtn"
+                    Content="ãƒžã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰è¨­å®š"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Width="180"/>
+
+            <!-- ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ãƒ•ã‚¡ã‚¤ãƒ«ã¸ã®ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆãƒœã‚¿ãƒ³ -->
+            <Button Name="ExportBtn"
+                    Content="ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆ"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Width="180"/>
+
+            <!-- ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã®ã‚¤ãƒ³ãƒãƒ¼ãƒˆãƒœã‚¿ãƒ³ -->
+            <Button Name="ImportBtn"
+                    Content="ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã‚¤ãƒ³ãƒãƒ¼ãƒˆ"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Width="180"/>
+        </StackPanel>
+    
+        <!-- ä¸­å¤®ã‚¨ãƒªã‚¢ï¼šå·¦å´ã«ã‚¿ã‚°ã‚¯ãƒ©ã‚¦ãƒ‰ã€å³å´ã« DataGrid ã‚’é…ç½® -->
+
         <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,*">
-            <!-- ¶‘¤Fƒ^ƒOƒNƒ‰ƒEƒh•\Ž¦ƒGƒŠƒA -->
+
+            <!-- å·¦å´ï¼šã‚¿ã‚°ã‚¯ãƒ©ã‚¦ãƒ‰è¡¨ç¤ºã‚¨ãƒªã‚¢ -->
             <StackPanel Grid.Column="0" Margin="8">
                 <TextBlock Text="Tag Cloud" FontWeight="Bold"/>
-                <!-- ƒ^ƒOƒNƒ‰ƒEƒh‚ðƒXƒNƒ[ƒ‹‰Â”\‚É‚·‚é ScrollViewer -->
+                <!-- ã‚¿ã‚°ã‚¯ãƒ©ã‚¦ãƒ‰ã‚’ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«å¯èƒ½ã«ã™ã‚‹ ScrollViewer -->
                 <ScrollViewer Height="400">
-                    <!-- ƒR[ƒhƒrƒnƒCƒ“ƒh‘¤‚©‚ç“®“I‚Éƒ^ƒO‚ð’Ç‰Á‚·‚é WrapPanel -->
+                    <!-- ã‚³ãƒ¼ãƒ‰ãƒ“ãƒã‚¤ãƒ³ãƒ‰å´ã‹ã‚‰å‹•çš„ã«ã‚¿ã‚°ã‚’è¿½åŠ ã™ã‚‹ WrapPanel -->
                     <WrapPanel Name="TagCloudPanel" />
                 </ScrollViewer>
             </StackPanel>
-
-            <!-- ‰E‘¤FŽ‘Šiî•ñˆê——‚ð•\Ž¦‚·‚é DataGrid -->
+            
+            <!-- å³å´ï¼šè³‡æ ¼æƒ…å ±ä¸€è¦§ã‚’è¡¨ç¤ºã™ã‚‹ DataGrid -->
             <DataGrid Name="DataGrid"
                       Grid.Column="1"
                       ItemsSource="{Binding Credentials}"
                       AutoGenerateColumns="False">
                 <DataGrid.Columns>
-                    <!-- ID —ñi“Ç‚ÝŽæ‚èê—pj -->
+                    <!-- ID åˆ—ï¼ˆèª­ã¿å–ã‚Šå°‚ç”¨ï¼‰ -->
                     <DataGridTextColumn Header="ID"
                                         Binding="{Binding Id}"
                                         Width="50"
                                         IsReadOnly="True"/>
-                    <!-- LoginId —ñ -->
+                    <!-- LoginId åˆ— -->
                     <DataGridTextColumn Header="Login"
                                         Binding="{Binding LoginId}"
                                         Width="2*"/>
-                    <!-- Password —ñiˆÃ†‰»‚³‚ê‚½•¶Žš—ñA‚Ü‚½‚Í•œ†‚³‚ê‚½ƒpƒXƒ[ƒhj -->
+                    <!-- Password åˆ—ï¼ˆæš—å·åŒ–ã•ã‚ŒãŸæ–‡å­—åˆ—ã€ã¾ãŸã¯å¾©å·ã•ã‚ŒãŸãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ï¼‰ -->
                     <DataGridTextColumn Header="Password"
                                         Binding="{Binding Password}"
                                         Width="2*"/>
-                    <!-- Category —ñ -->
+                    <!-- Category åˆ— -->
                     <DataGridTextColumn Header="Category"
                                         Binding="{Binding Category}"
                                         Width="*"/>
-                    <!-- Tags —ñiƒJƒ“ƒ}‹æØ‚è‚Ìƒ^ƒO•¶Žš—ñj -->
+                    <!-- Tags åˆ—ï¼ˆã‚«ãƒ³ãƒžåŒºåˆ‡ã‚Šã®ã‚¿ã‚°æ–‡å­—åˆ—ï¼‰ -->
                     <DataGridTextColumn Header="Tags"
                                         Binding="{Binding Tags}"
                                         Width="2*"/>
-                    <!-- Description —ñi—p“r‚âƒƒ‚‚È‚Ç‚Ìà–¾j -->
+                    <!-- Description åˆ—ï¼ˆç”¨é€”ã‚„ãƒ¡ãƒ¢ãªã©ã®èª¬æ˜Žï¼‰ -->
                     <DataGridTextColumn Header="Description"
                                         Binding="{Binding Description}"
                                         Width="3*"/>
@@ -86,46 +143,5 @@
             </DataGrid>
         </Grid>
 
-        <!-- ‰º•”‚Ì‘€ìƒ{ƒ^ƒ“ŒQFV‹KA•ÒWAíœAƒRƒs[Aƒ}ƒXƒ^[Ý’èAƒGƒNƒXƒ|[ƒgAƒCƒ“ƒ|[ƒg -->
-        <StackPanel DockPanel.Dock="Bottom"
-                    Orientation="Horizontal"
-                    Spacing="8"
-                    Margin="0,8,0,0">
-
-            <!-- V‹KƒŒƒR[ƒhì¬ƒ{ƒ^ƒ“iƒR[ƒhƒrƒnƒCƒ“ƒh‚Å Click ‚ðƒnƒ“ƒhƒ‹j -->
-            <Button Name="NewBtn"
-                    Content="New"
-                    Width="90"/>
-
-            <!-- ‘I‘ðs‚ð•ÒW‚·‚éƒ{ƒ^ƒ“ -->
-            <Button Name="EditBtn"
-                    Content="Edit Selected"
-                    Width="120"/>
-
-            <!-- ‘I‘ðs‚ðíœ‚·‚éƒ{ƒ^ƒ“ -->
-            <Button Name="DeleteBtn"
-                    Content="Delete Selected"
-                    Width="120"/>
-
-            <!-- ‘I‘ðs‚ÌƒpƒXƒ[ƒh‚ðƒNƒŠƒbƒvƒ{[ƒh‚ÖƒRƒs[‚·‚éƒ{ƒ^ƒ“ -->
-            <Button Name="CopyBtn"
-                    Content="Copy Password"
-                    Width="120"/>
-
-            <!-- ƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ðÝ’è^•ÏX‚·‚éƒ{ƒ^ƒ“ -->
-            <Button Name="SetMasterBtn"
-                    Content="Set Master Password"
-                    Width="180"/>
-
-            <!-- ƒoƒbƒNƒAƒbƒvƒtƒ@ƒCƒ‹‚Ö‚ÌƒGƒNƒXƒ|[ƒgƒ{ƒ^ƒ“ -->
-            <Button Name="ExportBtn"
-                    Content="Export Backup"
-                    Width="140"/>
-
-            <!-- ƒoƒbƒNƒAƒbƒvƒtƒ@ƒCƒ‹‚©‚ç‚ÌƒCƒ“ƒ|[ƒgƒ{ƒ^ƒ“ -->
-            <Button Name="ImportBtn"
-                    Content="Import Backup"
-                    Width="140"/>
-        </StackPanel>
     </DockPanel>
 </Window>

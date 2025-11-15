@@ -5,22 +5,22 @@ using System.IO;
 namespace potetofly25.KeyManager2.Data
 {
     /// <summary>
-    /// ƒf[ƒ^ƒx[ƒX‘€ì‚ği‚é EF Core ‚Ì DbContext ƒNƒ‰ƒXB
-    /// –{ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚É‚¨‚¯‚é‚·‚×‚Ä‚ÌƒGƒ“ƒeƒBƒeƒBEƒ‚ƒfƒ‹‚ğ‚±‚ÌƒRƒ“ƒeƒLƒXƒg‚ÅŠÇ—‚µ‚Ü‚·B
+    /// ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹æ“ä½œã‚’å¸ã‚‹ EF Core ã® DbContext ã‚¯ãƒ©ã‚¹ã€‚
+    /// æœ¬ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã«ãŠã‘ã‚‹ã™ã¹ã¦ã®ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ãƒ»ãƒ¢ãƒ‡ãƒ«ã‚’ã“ã®ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã§ç®¡ç†ã—ã¾ã™ã€‚
     /// </summary>
     public class KeyManagerDbContext : DbContext
     {
         /// <summary>
-        /// Credential ƒe[ƒuƒ‹‚ğ•\‚· DbSetB
-        /// ”FØî•ñiIDAƒpƒXƒ[ƒhAà–¾‚È‚Çj‚ğŠi”[‚¨‚æ‚ÑŒŸõ‚·‚é‚½‚ß‚Ég—p‚µ‚Ü‚·B
+        /// Credential ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’è¡¨ã™ DbSetã€‚
+        /// èªè¨¼æƒ…å ±ï¼ˆIDã€ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã€èª¬æ˜ãªã©ï¼‰ã‚’æ ¼ç´ãŠã‚ˆã³æ¤œç´¢ã™ã‚‹ãŸã‚ã«ä½¿ç”¨ã—ã¾ã™ã€‚
         /// </summary>
         public DbSet<Credential> Credentials { get; set; } = null!;
 
         /// <summary>
-        /// ƒf[ƒ^ƒx[ƒXÚ‘±İ’è‚ğs‚¤ƒƒ\ƒbƒhB
-        /// SQLite ‚Ìƒtƒ@ƒCƒ‹ƒpƒX‚ğ¶¬‚µADbContext ‚ÌÚ‘±æ‚Æ‚µ‚Ä\¬‚µ‚Ü‚·B
+        /// ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹æ¥ç¶šè¨­å®šã‚’è¡Œã†ãƒ¡ã‚½ãƒƒãƒ‰ã€‚
+        /// SQLite ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã‚’ç”Ÿæˆã—ã€DbContext ã®æ¥ç¶šå…ˆã¨ã—ã¦æ§‹æˆã—ã¾ã™ã€‚
         /// </summary>
-        /// <param name="optionsBuilder">DbContextOptionsBuilder ƒCƒ“ƒXƒ^ƒ“ƒX</param>
+        /// <param name="optionsBuilder">DbContextOptionsBuilder ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹</param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "KeyManager2.db");

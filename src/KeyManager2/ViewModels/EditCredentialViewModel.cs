@@ -7,101 +7,101 @@ using potetofly25.KeyManager2.Services;
 namespace potetofly25.KeyManager2.ViewModels
 {
     /// <summary>
-    /// ���i���i<see cref="Credential"/>�j�̕ҏW��ʗp ViewModel �N���X�ł��B
-    /// �p�X���[�h�̕ҏW�E������������у_�C�A���O�� OK / Cancel ����𐧌䂵�܂��B
+    /// 資格情報（<see cref="Credential"/>）の編集画面用 ViewModel クラスです。
+    /// パスワードの編集・自動生成およびダイアログの OK / Cancel 操作を制御します。
     /// </summary>
     public partial class EditCredentialViewModel : ObservableObject
     {
         /// <summary>
-        /// �ҏW�ΏۂƂȂ鎑�i���I�u�W�F�N�g�ł��B
-        /// ��ʂ̊e���͍��ڂƃo�C���h����܂��B
+        /// 編集対象となる資格情報オブジェクトです。
+        /// 画面の各入力項目とバインドされます。
         /// </summary>
         [ObservableProperty]
         private Credential credential;
 
         /// <summary>
-        /// ������������p�X���[�h�̒����ł��B
+        /// 自動生成するパスワードの長さです。
         /// </summary>
         [ObservableProperty]
         private int length = 12;
 
         /// <summary>
-        /// ���������p�X���[�h�ɉp�啶�����܂߂邩�ǂ�����\���t���O�ł��B
+        /// 自動生成パスワードに英大文字を含めるかどうかを表すフラグです。
         /// </summary>
         [ObservableProperty]
         private bool useUpper = true;
 
         /// <summary>
-        /// ���������p�X���[�h�ɉp���������܂߂邩�ǂ�����\���t���O�ł��B
+        /// 自動生成パスワードに英小文字を含めるかどうかを表すフラグです。
         /// </summary>
         [ObservableProperty]
         private bool useLower = true;
 
         /// <summary>
-        /// ���������p�X���[�h�ɐ������܂߂邩�ǂ�����\���t���O�ł��B
+        /// 自動生成パスワードに数字を含めるかどうかを表すフラグです。
         /// </summary>
         [ObservableProperty]
         private bool useDigits = true;
 
         /// <summary>
-        /// ���������p�X���[�h�ɋL�����܂߂邩�ǂ�����\���t���O�ł��B
+        /// 自動生成パスワードに記号を含めるかどうかを表すフラグです。
         /// </summary>
         [ObservableProperty]
         private bool useSymbols = true;
 
         /// <summary>
-        /// �p�X���[�h�������W�b�N��񋟂���T�[�r�X�ł��B
+        /// パスワード生成ロジックを提供するサービスです。
         /// </summary>
         private readonly PasswordGeneratorService _pg = new();
 
         /// <summary>
-        /// <see cref="EditCredentialViewModel"/> �̐V�����C���X�^���X�����������܂��B
-        /// �ҏW�Ώۂ� <see cref="Credential"/> ���󂯎��A��ʂ֔��f���邽�߂̃v���p�e�B�ɐݒ肵�܂��B
+        /// <see cref="EditCredentialViewModel"/> の新しいインスタンスを初期化します。
+        /// 編集対象の <see cref="Credential"/> を受け取り、画面へ反映するためのプロパティに設定します。
         /// </summary>
-        /// <param name="c">�ҏW�ΏۂƂȂ鎑�i���I�u�W�F�N�g�B</param>
+        /// <param name="c">編集対象となる資格情報オブジェクト。</param>
         public EditCredentialViewModel(Credential c)
         {
-            // ��ʂŕҏW���� Credential ���Z�b�g
+            // 画面で編集する Credential をセット
             Credential = c;
         }
 
         /// <summary>
-        /// �p�X���[�h���������R�}���h�ł��B
-        /// ���݂̐ݒ�i<see cref="Length"/>�A<see cref="UseUpper"/>�A<see cref="UseLower"/>�A
-        /// <see cref="UseDigits"/>�A<see cref="UseSymbols"/>�j�Ɋ�Â��ăp�X���[�h�𐶐����A
-        /// <see cref="Credential.Password"/> �ɔ��f���܂��B
+        /// パスワード自動生成コマンドです。
+        /// 現在の設定（<see cref="Length"/>、<see cref="UseUpper"/>、<see cref="UseLower"/>、
+        /// <see cref="UseDigits"/>、<see cref="UseSymbols"/>）に基づいてパスワードを生成し、
+        /// <see cref="Credential.Password"/> に反映します。
         /// </summary>
         [RelayCommand]
         private void GeneratePassword()
         {
-            // �p�X���[�h�𐶐����ACredential �ɓK�p
+            // パスワードを生成し、Credential に適用
             Credential.Password = _pg.Generate(Length, UseUpper, UseLower, UseDigits, UseSymbols);
 
-            // Credential �I�u�W�F�N�g�̕ύX�� UI �ɓ`����
+            // Credential オブジェクトの変更を UI に伝える
             OnPropertyChanged(nameof(Credential));
         }
 
         /// <summary>
-        /// �ҏW���ʂ�ۑ��i�m��j����R�}���h�ł��B
-        /// �Ăяo�����ɂ̓_�C�A���O�̖߂�l�Ƃ��� true ��Ԃ��܂��B
+        /// 編集結果を保存（確定）するコマンドです。
+        /// 呼び出し元にはダイアログの戻り値として true を返します。
         /// </summary>
-        /// <param name="window">���� ViewModel �ɑΉ�����E�B���h�E�C���X�^���X�B</param>
+        /// <param name="window">この ViewModel に対応するウィンドウインスタンス。</param>
         [RelayCommand]
         private static void Save(Window window)
         {
-            // true ��Ԃ��ăE�B���h�E�����i�ۑ��m����Ӗ�����j
+            // true を返してウィンドウを閉じる（保存確定を意味する）
             window?.Close(true);
         }
 
         /// <summary>
-        /// �ҏW���L�����Z������R�}���h�ł��B
-        /// �Ăяo�����ɂ̓_�C�A���O�̖߂�l�Ƃ��� false ��Ԃ��܂��B
+        /// 編集をキャンセルするコマンドです。
+        /// 呼び出し元にはダイアログの戻り値として false を返します。
         /// </summary>
-        /// <param name="window">���� ViewModel �ɑΉ�����E�B���h�E�C���X�^���X�B</param>
+        /// <param name="window">この ViewModel に対応するウィンドウインスタンス。</param>
         [RelayCommand]
         private static void Cancel(Window window)
         {
-            // false ��Ԃ��ăE�B���h�E�����i�L�����Z�����Ӗ�����j
+            // false を返してウィンドウを閉じる（キャンセルを意味する）
             window?.Close(false);
         }
     }

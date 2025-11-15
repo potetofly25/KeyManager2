@@ -4,32 +4,32 @@ using potetofly25.KeyManager2.ViewModels;
 namespace potetofly25.KeyManager2.Views
 {
     /// <summary>
-    /// �P��p�X���[�h���͗p�̃_�C�A���O�E�B���h�E�ł��B
-    /// <see cref="SimplePasswordViewModel"/> �� DataContext �Ƃ��Ďg�p���A
-    /// ���[�U�[����p�X���[�h����͂��Ă��炤�ړI�ŗ��p����܂��B
+    /// 単一パスワード入力用のダイアログウィンドウです。
+    /// <see cref="SimplePasswordViewModel"/> を DataContext として使用し、
+    /// ユーザーからパスワードを入力してもらう目的で利用されます。
     /// </summary>
     public partial class SimplePasswordWindow : Window
     {
         /// <summary>
-        /// ���̃E�B���h�E�� DataContext �ɐݒ肳��Ă���
-        /// <see cref="SimplePasswordViewModel"/> ���擾���܂��B
+        /// このウィンドウの DataContext に設定されている
+        /// <see cref="SimplePasswordViewModel"/> を取得します。
         /// </summary>
         public SimplePasswordViewModel ViewModel => DataContext as SimplePasswordViewModel;
 
         /// <summary>
-        /// <see cref="SimplePasswordWindow"/> �̐V�����C���X�^���X�����������܂��B
-        /// �E�B���h�E�^�C�g�����w��ł��AViewModel �ƕR�t���� UI ���\�z���܂��B
+        /// <see cref="SimplePasswordWindow"/> の新しいインスタンスを初期化します。
+        /// ウィンドウタイトルを指定でき、ViewModel と紐付けて UI を構築します。
         /// </summary>
-        /// <param name="title">�_�C�A���O�̃^�C�g���B���w��̏ꍇ�� "Enter Password"�B</param>
+        /// <param name="title">ダイアログのタイトル。未指定の場合は "Enter Password"。</param>
         public SimplePasswordWindow(string title = "Enter Password")
         {
-            // XAML �ɒ�`���ꂽ�R���|�[�l���g��������
+            // XAML に定義されたコンポーネントを初期化
             InitializeComponent();
 
-            // �E�B���h�E�^�C�g����ݒ�
+            // ウィンドウタイトルを設定
             Title = title;
 
-            // ���̃E�B���h�E���󂯎�� ViewModel �� DataContext �Ƃ��Đݒ�
+            // このウィンドウを受け取る ViewModel を DataContext として設定
             DataContext = new SimplePasswordViewModel(this);
         }
     }

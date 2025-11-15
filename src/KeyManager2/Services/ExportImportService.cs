@@ -9,77 +9,77 @@ using System.Text.Json;
 namespace potetofly25.KeyManager2.Services
 {
     /// <summary>
-    /// ‘Šiî•ñi<see cref="Credential"/>j‚ÌƒGƒNƒXƒ|[ƒg^ƒCƒ“ƒ|[ƒgˆ—‚ğ’ñ‹Ÿ‚·‚éƒT[ƒrƒXƒNƒ‰ƒX‚Å‚·B
-    /// ƒAƒvƒŠ“à‚Ìƒf[ƒ^‚ğƒtƒ@ƒCƒ‹‚ÖˆÀ‘S‚É‘‚«o‚µA‚Ü‚½ƒtƒ@ƒCƒ‹‚©‚ç•œŒ³‚·‚é‚½‚ß‚Ì
-    /// ˆÃ†‰»‚¨‚æ‚ÑƒVƒŠƒAƒ‰ƒCƒYˆ—‚ğƒJƒvƒZƒ‹‰»‚µ‚Ü‚·B
+    /// è³‡æ ¼æƒ…å ±ï¼ˆ<see cref="Credential"/>ï¼‰ã®ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆï¼ã‚¤ãƒ³ãƒãƒ¼ãƒˆå‡¦ç†ã‚’æä¾›ã™ã‚‹ã‚µãƒ¼ãƒ“ã‚¹ã‚¯ãƒ©ã‚¹ã§ã™ã€‚
+    /// ã‚¢ãƒ—ãƒªå†…ã®ãƒ‡ãƒ¼ã‚¿ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã¸å®‰å…¨ã«æ›¸ãå‡ºã—ã€ã¾ãŸãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰å¾©å…ƒã™ã‚‹ãŸã‚ã®
+    /// æš—å·åŒ–ãŠã‚ˆã³ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºå‡¦ç†ã‚’ã‚«ãƒ—ã‚»ãƒ«åŒ–ã—ã¾ã™ã€‚
     /// </summary>
     public static class ExportImportService
     {
-        // JsonSerializerOptions ‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğƒLƒƒƒbƒVƒ…‚µ‚ÄÄ—˜—p
+        // JsonSerializerOptions ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã—ã¦å†åˆ©ç”¨
         private static readonly JsonSerializerOptions CachedJsonSerializerOptions = new() { WriteIndented = true };
 
         /// <summary>
-        /// ‚·‚×‚Ä‚Ì <see cref="Credential"/> ‚ğw’èƒpƒX‚ÉƒGƒNƒXƒ|[ƒg‚µ‚Ü‚·B
-        /// ƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ªİ’è‚³‚ê‚Ä‚¢‚éê‡‚Í <see cref="AdvancedEncryptionService"/> ‚ğ—p‚¢‚Ä fileKey ‚ğƒ‰ƒbƒv‚µA
-        /// –¢İ’è‚Ìê‡‚Íƒ†[ƒU[w’è‚ÌƒGƒNƒXƒ|[ƒg—pƒpƒXƒ[ƒh‚Å fileKey ‚ğˆÃ†‰»‚µ‚Ü‚·B
+        /// ã™ã¹ã¦ã® <see cref="Credential"/> ã‚’æŒ‡å®šãƒ‘ã‚¹ã«ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆã—ã¾ã™ã€‚
+        /// ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ <see cref="AdvancedEncryptionService"/> ã‚’ç”¨ã„ã¦ fileKey ã‚’ãƒ©ãƒƒãƒ—ã—ã€
+        /// æœªè¨­å®šã®å ´åˆã¯ãƒ¦ãƒ¼ã‚¶ãƒ¼æŒ‡å®šã®ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆç”¨ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã§ fileKey ã‚’æš—å·åŒ–ã—ã¾ã™ã€‚
         /// </summary>
-        /// <param name="path">ƒGƒNƒXƒ|[ƒgæƒtƒ@ƒCƒ‹‚Ìƒtƒ‹ƒpƒXB</param>
+        /// <param name="path">ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆå…ˆãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ãƒ«ãƒ‘ã‚¹ã€‚</param>
         /// <param name="exportPassword">
-        /// ƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ª–¢İ’è‚Ìê‡‚É fileKey ‚ğˆÃ†‰»‚·‚é‚½‚ß‚Ég—p‚³‚ê‚éƒpƒXƒ[ƒhB
-        /// ƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ªİ’è‚³‚ê‚Ä‚¢‚éê‡‚Í–³‹‚³‚ê‚Ü‚·B
+        /// ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒæœªè¨­å®šã®å ´åˆã« fileKey ã‚’æš—å·åŒ–ã™ã‚‹ãŸã‚ã«ä½¿ç”¨ã•ã‚Œã‚‹ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã€‚
+        /// ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ç„¡è¦–ã•ã‚Œã¾ã™ã€‚
         /// </param>
         /// <exception cref="InvalidOperationException">
-        /// ƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ª–¢İ’è‚©‚Â <paramref name="exportPassword"/> ‚ª null ‚Ü‚½‚Í‹ó•¶š‚Ìê‡‚ÉƒXƒ[‚³‚ê‚Ü‚·B
+        /// ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒæœªè¨­å®šã‹ã¤ <paramref name="exportPassword"/> ãŒ null ã¾ãŸã¯ç©ºæ–‡å­—ã®å ´åˆã«ã‚¹ãƒ­ãƒ¼ã•ã‚Œã¾ã™ã€‚
         /// </exception>
         public static void ExportAll(string path, string? exportPassword = null)
         {
-            // ƒoƒbƒNƒAƒbƒvƒtƒ@ƒCƒ‹“à‚ÌŒÂX‚ÌƒŒƒR[ƒhˆÃ†‰»‚Ég—p‚·‚éˆê“I‚È fileKey ‚ğ¶¬i32 ƒoƒCƒgj
+            // ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ãƒ•ã‚¡ã‚¤ãƒ«å†…ã®å€‹ã€…ã®ãƒ¬ã‚³ãƒ¼ãƒ‰æš—å·åŒ–ã«ä½¿ç”¨ã™ã‚‹ä¸€æ™‚çš„ãª fileKey ã‚’ç”Ÿæˆï¼ˆ32 ãƒã‚¤ãƒˆï¼‰
             var fileKey = new byte[32];
             RandomNumberGenerator.Fill(fileKey);
 
             byte[] wrapped;
 
-            // ƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ªİ’è‚³‚ê‚Ä‚¢‚éê‡‚Í AdvancedEncryptionService ‚Å fileKey ‚ğƒ‰ƒbƒv
+            // ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ AdvancedEncryptionService ã§ fileKey ã‚’ãƒ©ãƒƒãƒ—
             if (AdvancedEncryptionService.IsMasterSet)
             {
-                // fileKey ‚ğ Base64 ‚É‚µ‚Ä•¶š—ñ‚Æ‚µ‚ÄˆÃ†‰»
+                // fileKey ã‚’ Base64 ã«ã—ã¦æ–‡å­—åˆ—ã¨ã—ã¦æš—å·åŒ–
                 var b64 = Convert.ToBase64String(fileKey);
                 var wrappedStr = AdvancedEncryptionService.EncryptString(b64);
 
-                // ƒ‰ƒbƒv‚³‚ê‚½•¶š—ñ‚ğ UTF-8 ƒoƒCƒg—ñ‚Æ‚µ‚Ä•Û‘¶‘ÎÛ‚Æ‚·‚é
+                // ãƒ©ãƒƒãƒ—ã•ã‚ŒãŸæ–‡å­—åˆ—ã‚’ UTF-8 ãƒã‚¤ãƒˆåˆ—ã¨ã—ã¦ä¿å­˜å¯¾è±¡ã¨ã™ã‚‹
                 wrapped = Encoding.UTF8.GetBytes(wrappedStr);
             }
             else
             {
-                // ƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ª‚È‚¢ê‡Aƒ†[ƒU[w’è‚Ì exportPassword ‚Å fileKey ‚ğˆÃ†‰»‚·‚é
+                // ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒãªã„å ´åˆã€ãƒ¦ãƒ¼ã‚¶ãƒ¼æŒ‡å®šã® exportPassword ã§ fileKey ã‚’æš—å·åŒ–ã™ã‚‹
                 if (string.IsNullOrEmpty(exportPassword))
                 {
                     throw new InvalidOperationException("Export password required");
                 }
 
-                // ƒ†[ƒU[ƒpƒXƒ[ƒh—p‚Ìƒ\ƒ‹ƒg‚ğ¶¬i16 ƒoƒCƒgj
+                // ãƒ¦ãƒ¼ã‚¶ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ç”¨ã®ã‚½ãƒ«ãƒˆã‚’ç”Ÿæˆï¼ˆ16 ãƒã‚¤ãƒˆï¼‰
                 var salt = RandomNumberGenerator.GetBytes(16);
 
-                // PBKDF2 ‚ğg‚Á‚ÄƒpƒXƒ[ƒh‚©‚ç 32 ƒoƒCƒg‚ÌŒ®‚ğ“±oi”½•œ‰ñ” 200,000j
+                // PBKDF2 ã‚’ä½¿ã£ã¦ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‹ã‚‰ 32 ãƒã‚¤ãƒˆã®éµã‚’å°å‡ºï¼ˆåå¾©å›æ•° 200,000ï¼‰
                 using var derive = new Rfc2898DeriveBytes(exportPassword, salt, 200_000, HashAlgorithmName.SHA256);
                 var key = derive.GetBytes(32);
 
-                // AES-GCM —p IVi12 ƒoƒCƒgj‚ğ¶¬
+                // AES-GCM ç”¨ IVï¼ˆ12 ãƒã‚¤ãƒˆï¼‰ã‚’ç”Ÿæˆ
                 var iv = RandomNumberGenerator.GetBytes(12);
 
-                // ”FØƒ^ƒO—pƒoƒbƒtƒ@i16 ƒoƒCƒgj
+                // èªè¨¼ã‚¿ã‚°ç”¨ãƒãƒƒãƒ•ã‚¡ï¼ˆ16 ãƒã‚¤ãƒˆï¼‰
                 var tag = new byte[16];
 
                 byte[] cipher;
 
-                // AES-GCM ‚Å fileKey ‚ğˆÃ†‰»
+                // AES-GCM ã§ fileKey ã‚’æš—å·åŒ–
                 using (var aes = new AesGcm(key, 16))
                 {
                     cipher = new byte[fileKey.Length];
                     aes.Encrypt(iv, fileKey, cipher, tag);
                 }
 
-                // salt + iv + cipher + tag ‚ğ˜AŒ‹‚µ‚½ƒ‰ƒbƒvÏ‚İƒoƒbƒtƒ@‚ğ\’z
+                // salt + iv + cipher + tag ã‚’é€£çµã—ãŸãƒ©ãƒƒãƒ—æ¸ˆã¿ãƒãƒƒãƒ•ã‚¡ã‚’æ§‹ç¯‰
                 var wrappedBuf = new byte[salt.Length + iv.Length + cipher.Length + tag.Length];
                 Buffer.BlockCopy(salt, 0, wrappedBuf, 0, salt.Length);
                 Buffer.BlockCopy(iv, 0, wrappedBuf, salt.Length, iv.Length);
@@ -89,41 +89,41 @@ namespace potetofly25.KeyManager2.Services
                 wrapped = wrappedBuf;
             }
 
-            // ƒGƒNƒXƒ|[ƒgƒpƒbƒP[ƒW‚ğ\’z‚µAfileKey ‚Ìƒ‰ƒbƒvƒf[ƒ^‚ğ Base64 ‚ÅŠi”[
+            // ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆãƒ‘ãƒƒã‚±ãƒ¼ã‚¸ã‚’æ§‹ç¯‰ã—ã€fileKey ã®ãƒ©ãƒƒãƒ—ãƒ‡ãƒ¼ã‚¿ã‚’ Base64 ã§æ ¼ç´
             var pkg = new ExportPackage
             {
                 WrappedFileKeyBase64 = Convert.ToBase64String(wrapped)
             };
 
-            // Œ»İ‚Ì‘Šiî•ñ‚ğæ“¾iƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ª‚ ‚éê‡‚Í¶ƒpƒXƒ[ƒh‚Ü‚Å•œ†‚µ‚½ó‘Ô‚Åæ“¾j
+            // ç¾åœ¨ã®è³‡æ ¼æƒ…å ±ã‚’å–å¾—ï¼ˆãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒã‚ã‚‹å ´åˆã¯ç”Ÿãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã¾ã§å¾©å·ã—ãŸçŠ¶æ…‹ã§å–å¾—ï¼‰
             var svc = new CredentialService();
             var records = svc.GetAll(tryDecrypt: AdvancedEncryptionService.IsMasterSet);
 
-            // ŠeƒŒƒR[ƒh‚ÌƒpƒXƒ[ƒh‚ğ fileKey ‚ÅˆÃ†‰»‚µARecord ‚Æ‚µ‚ÄƒpƒbƒP[ƒW‚É‹l‚ß‚é
+            // å„ãƒ¬ã‚³ãƒ¼ãƒ‰ã®ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ fileKey ã§æš—å·åŒ–ã—ã€Record ã¨ã—ã¦ãƒ‘ãƒƒã‚±ãƒ¼ã‚¸ã«è©°ã‚ã‚‹
             foreach (var r in records)
             {
-                // ƒpƒXƒ[ƒh‚ğ UTF-8 ƒoƒCƒg—ñ‚É•ÏŠ·
+                // ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ UTF-8 ãƒã‚¤ãƒˆåˆ—ã«å¤‰æ›
                 var plain = Encoding.UTF8.GetBytes(r.Password ?? string.Empty);
 
-                // AES-GCM —p IV ‚Æƒ^ƒO‚ğ€”õ
+                // AES-GCM ç”¨ IV ã¨ã‚¿ã‚°ã‚’æº–å‚™
                 var iv = RandomNumberGenerator.GetBytes(12);
                 var tag = new byte[16];
                 byte[] cipher;
 
-                // fileKey ‚ğg—p‚µ‚ÄƒpƒXƒ[ƒh‚ğˆÃ†‰»
+                // fileKey ã‚’ä½¿ç”¨ã—ã¦ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’æš—å·åŒ–
                 using (var aes = new AesGcm(fileKey, 16))
                 {
                     cipher = new byte[plain.Length];
                     aes.Encrypt(iv, plain, cipher, tag);
                 }
 
-                // iv + cipher + tag ‚ğ˜AŒ‹‚µ‚½ƒyƒCƒ[ƒh‚ğ\’z
+                // iv + cipher + tag ã‚’é€£çµã—ãŸãƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã‚’æ§‹ç¯‰
                 var payload = new byte[iv.Length + cipher.Length + tag.Length];
                 Buffer.BlockCopy(iv, 0, payload, 0, iv.Length);
                 Buffer.BlockCopy(cipher, 0, payload, iv.Length, cipher.Length);
                 Buffer.BlockCopy(tag, 0, payload, iv.Length + cipher.Length, tag.Length);
 
-                // ƒGƒNƒXƒ|[ƒg—p Record ‚Æ‚µ‚ÄƒpƒbƒP[ƒW‚É’Ç‰Á
+                // ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆç”¨ Record ã¨ã—ã¦ãƒ‘ãƒƒã‚±ãƒ¼ã‚¸ã«è¿½åŠ 
                 pkg.Records.Add(new Record
                 {
                     Id = r.Id,
@@ -136,7 +136,7 @@ namespace potetofly25.KeyManager2.Services
                 });
             }
 
-            // ƒpƒbƒP[ƒW‘S‘Ì‚ğ JSON ‚ÉƒVƒŠƒAƒ‰ƒCƒY‚µAUTF-8 ‚Åƒtƒ@ƒCƒ‹‚É‘‚«o‚·iƒCƒ“ƒfƒ“ƒg•t‚«j
+            // ãƒ‘ãƒƒã‚±ãƒ¼ã‚¸å…¨ä½“ã‚’ JSON ã«ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã—ã€UTF-8 ã§ãƒ•ã‚¡ã‚¤ãƒ«ã«æ›¸ãå‡ºã™ï¼ˆã‚¤ãƒ³ãƒ‡ãƒ³ãƒˆä»˜ãï¼‰
             File.WriteAllText(
                 path,
                 JsonSerializer.Serialize(pkg, CachedJsonSerializerOptions),
@@ -144,56 +144,56 @@ namespace potetofly25.KeyManager2.Services
         }
 
         /// <summary>
-        /// ƒGƒNƒXƒ|[ƒgƒtƒ@ƒCƒ‹‚©‚ç‚·‚×‚Ä‚Ì <see cref="Credential"/> ‚ğ•œŒ³‚µA
-        /// Œ»İ‚Ìƒf[ƒ^ƒx[ƒX‚ÖƒCƒ“ƒ|[ƒg‚µ‚Ü‚·B
-        /// ƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ªİ’è‚³‚ê‚Ä‚¢‚éê‡‚Í <see cref="AdvancedEncryptionService"/> ‚ğg—p‚µ‚Ä fileKey ‚ğ•œ†‚µA
-        /// –¢İ’è‚Ìê‡‚Íƒ†[ƒU[w’è‚ÌƒCƒ“ƒ|[ƒg—pƒpƒXƒ[ƒh‚Å fileKey ‚ğ•œ†‚µ‚Ü‚·B
+        /// ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã™ã¹ã¦ã® <see cref="Credential"/> ã‚’å¾©å…ƒã—ã€
+        /// ç¾åœ¨ã®ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ã¸ã‚¤ãƒ³ãƒãƒ¼ãƒˆã—ã¾ã™ã€‚
+        /// ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ <see cref="AdvancedEncryptionService"/> ã‚’ä½¿ç”¨ã—ã¦ fileKey ã‚’å¾©å·ã—ã€
+        /// æœªè¨­å®šã®å ´åˆã¯ãƒ¦ãƒ¼ã‚¶ãƒ¼æŒ‡å®šã®ã‚¤ãƒ³ãƒãƒ¼ãƒˆç”¨ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã§ fileKey ã‚’å¾©å·ã—ã¾ã™ã€‚
         /// </summary>
-        /// <param name="path">ƒCƒ“ƒ|[ƒg‘ÎÛ‚ÌƒGƒNƒXƒ|[ƒgƒtƒ@ƒCƒ‹‚Ìƒtƒ‹ƒpƒXB</param>
+        /// <param name="path">ã‚¤ãƒ³ãƒãƒ¼ãƒˆå¯¾è±¡ã®ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ãƒ«ãƒ‘ã‚¹ã€‚</param>
         /// <param name="importPassword">
-        /// ƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ª–¢İ’è‚Ìê‡‚É fileKey ‚ğ•œ†‚·‚é‚½‚ß‚Ég—p‚³‚ê‚éƒpƒXƒ[ƒhB
-        /// ƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ªİ’è‚³‚ê‚Ä‚¢‚éê‡‚Í–³‹‚³‚ê‚Ü‚·B
+        /// ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒæœªè¨­å®šã®å ´åˆã« fileKey ã‚’å¾©å·ã™ã‚‹ãŸã‚ã«ä½¿ç”¨ã•ã‚Œã‚‹ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã€‚
+        /// ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ç„¡è¦–ã•ã‚Œã¾ã™ã€‚
         /// </param>
         /// <exception cref="InvalidOperationException">
-        /// ƒpƒbƒP[ƒW‚ª•s³‚ÈŒ`®‚Ìê‡A‚Ü‚½‚Íƒ}ƒXƒ^[ƒpƒXƒ[ƒh–¢İ’è‚©‚Â <paramref name="importPassword"/> ‚ª null ‚Ü‚½‚Í‹ó•¶š‚Ìê‡‚ÉƒXƒ[‚³‚ê‚Ü‚·B
+        /// ãƒ‘ãƒƒã‚±ãƒ¼ã‚¸ãŒä¸æ­£ãªå½¢å¼ã®å ´åˆã€ã¾ãŸã¯ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰æœªè¨­å®šã‹ã¤ <paramref name="importPassword"/> ãŒ null ã¾ãŸã¯ç©ºæ–‡å­—ã®å ´åˆã«ã‚¹ãƒ­ãƒ¼ã•ã‚Œã¾ã™ã€‚
         /// </exception>
         /// <exception cref="CryptographicException">
-        /// ƒpƒXƒ[ƒh•sˆê’v‚âƒf[ƒ^”j‘¹‚È‚Ç‚É‚æ‚èˆÃ†•œ†‚É¸”s‚µ‚½ê‡‚ÉƒXƒ[‚³‚ê‚é‰Â”\«‚ª‚ ‚è‚Ü‚·B
+        /// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ä¸ä¸€è‡´ã‚„ãƒ‡ãƒ¼ã‚¿ç ´æãªã©ã«ã‚ˆã‚Šæš—å·å¾©å·ã«å¤±æ•—ã—ãŸå ´åˆã«ã‚¹ãƒ­ãƒ¼ã•ã‚Œã‚‹å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ã€‚
         /// </exception>
         public static void ImportAll(string path, string? importPassword = null)
         {
-            // ƒtƒ@ƒCƒ‹‚©‚ç JSON •¶š—ñ‚ğ“Ç‚İ‚İ
+            // ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ JSON æ–‡å­—åˆ—ã‚’èª­ã¿è¾¼ã¿
             var json = File.ReadAllText(path, Encoding.UTF8);
 
-            // JSON ‚ğ ExportPackage ‚Æ‚µ‚ÄƒfƒVƒŠƒAƒ‰ƒCƒYi¸”s‚µ‚½ê‡‚Í InvalidOperationExceptionj
+            // JSON ã‚’ ExportPackage ã¨ã—ã¦ãƒ‡ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºï¼ˆå¤±æ•—ã—ãŸå ´åˆã¯ InvalidOperationExceptionï¼‰
             var pkg = JsonSerializer.Deserialize<ExportPackage>(json, CachedJsonSerializerOptions) ?? throw new InvalidOperationException("Invalid package");
 
-            // ƒ‰ƒbƒvÏ‚İ fileKey ‚ğ Base64 ‚©‚çƒoƒCƒg”z—ñ‚Ö•œŒ³
+            // ãƒ©ãƒƒãƒ—æ¸ˆã¿ fileKey ã‚’ Base64 ã‹ã‚‰ãƒã‚¤ãƒˆé…åˆ—ã¸å¾©å…ƒ
             var wrapped = Convert.FromBase64String(pkg.WrappedFileKeyBase64);
 
             byte[] fileKey;
 
-            // ƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ªİ’è‚³‚ê‚Ä‚¢‚éê‡‚Í AdvancedEncryptionService ‚Å‰ğ•ï
+            // ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ AdvancedEncryptionService ã§è§£åŒ…
             if (AdvancedEncryptionService.IsMasterSet)
             {
-                // ƒ‰ƒbƒv‚³‚ê‚½ fileKey ƒf[ƒ^‚ğ UTF-8 •¶š—ñ‚Æ‚µ‚Äæ“¾
+                // ãƒ©ãƒƒãƒ—ã•ã‚ŒãŸ fileKey ãƒ‡ãƒ¼ã‚¿ã‚’ UTF-8 æ–‡å­—åˆ—ã¨ã—ã¦å–å¾—
                 var wrappedStr = Encoding.UTF8.GetString(wrapped);
 
-                // •¶š—ñ‚ğ AdvancedEncryptionService ‚Å•œ†‚µ‚Ä Base64 ‚Ì fileKey ‚ğæ‚èo‚·
+                // æ–‡å­—åˆ—ã‚’ AdvancedEncryptionService ã§å¾©å·ã—ã¦ Base64 ã® fileKey ã‚’å–ã‚Šå‡ºã™
                 var b64 = AdvancedEncryptionService.DecryptString(wrappedStr);
 
-                // fileKey ‚ğƒoƒCƒg—ñ‚É–ß‚·
+                // fileKey ã‚’ãƒã‚¤ãƒˆåˆ—ã«æˆ»ã™
                 fileKey = Convert.FromBase64String(b64);
             }
             else
             {
-                // ƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ª‚È‚¢ê‡‚Í importPassword ‚É‚æ‚é•œ†‚ª•K—v
+                // ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒãªã„å ´åˆã¯ importPassword ã«ã‚ˆã‚‹å¾©å·ãŒå¿…è¦
                 if (string.IsNullOrEmpty(importPassword))
                 {
                     throw new InvalidOperationException("Import password required");
                 }
 
-                // wrapped ‚Í salt + iv + cipher + tag ‚Ì\‘¢
+                // wrapped ã¯ salt + iv + cipher + tag ã®æ§‹é€ 
                 var salt = wrapped.Take(16).ToArray();
                 var iv = wrapped.Skip(16).Take(12).ToArray();
                 var tag = wrapped.Skip(wrapped.Length - 16).Take(16).ToArray();
@@ -201,44 +201,44 @@ namespace potetofly25.KeyManager2.Services
                                     .Take(wrapped.Length - 16 - iv.Length - tag.Length)
                                     .ToArray();
 
-                // PBKDF2 ‚ÅƒCƒ“ƒ|[ƒgƒpƒXƒ[ƒh‚©‚çŒ®‚ğ“±o
+                // PBKDF2 ã§ã‚¤ãƒ³ãƒãƒ¼ãƒˆãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‹ã‚‰éµã‚’å°å‡º
                 using var derive = new Rfc2898DeriveBytes(importPassword, salt, 200_000, HashAlgorithmName.SHA256);
                 var key = derive.GetBytes(32);
 
-                // •œ†‚³‚ê‚½ fileKey —p‚Ìƒoƒbƒtƒ@‚ğŠm•Û
+                // å¾©å·ã•ã‚ŒãŸ fileKey ç”¨ã®ãƒãƒƒãƒ•ã‚¡ã‚’ç¢ºä¿
                 fileKey = new byte[cipher.Length];
 
-                // AES-GCM ‚Å fileKey ‚ğ•œ†
+                // AES-GCM ã§ fileKey ã‚’å¾©å·
                 using var aes = new AesGcm(key, 16);
                 aes.Decrypt(iv, cipher, tag, fileKey);
             }
 
-            // •œ†‚µ‚½ fileKey ‚ğ—p‚¢‚ÄŠe Record ‚ÌƒpƒXƒ[ƒh‚ğ•œ†‚µACredential ‚Æ‚µ‚Ä DB ‚É•Û‘¶
+            // å¾©å·ã—ãŸ fileKey ã‚’ç”¨ã„ã¦å„ Record ã®ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’å¾©å·ã—ã€Credential ã¨ã—ã¦ DB ã«ä¿å­˜
             var svc = new CredentialService();
 
             foreach (var rec in pkg.Records)
             {
-                // payload ‚Í iv + cipher + tag ‚ğ Base64 ‰»‚µ‚½‚à‚Ì
+                // payload ã¯ iv + cipher + tag ã‚’ Base64 åŒ–ã—ãŸã‚‚ã®
                 var payload = Convert.FromBase64String(rec.Password);
 
-                // iv / tag / cipher ‚ğ•ªŠ„
+                // iv / tag / cipher ã‚’åˆ†å‰²
                 var iv = payload.Take(12).ToArray();
                 var tag = payload.Skip(payload.Length - 16).Take(16).ToArray();
                 var cipher = payload.Skip(12).Take(payload.Length - 12 - 16).ToArray();
 
-                // •½•¶ƒpƒXƒ[ƒh—pƒoƒbƒtƒ@
+                // å¹³æ–‡ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ç”¨ãƒãƒƒãƒ•ã‚¡
                 var plain = new byte[cipher.Length];
 
-                // fileKey ‚ğg—p‚µ‚ÄƒpƒXƒ[ƒh‚ğ•œ†
+                // fileKey ã‚’ä½¿ç”¨ã—ã¦ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’å¾©å·
                 using (var aes = new AesGcm(fileKey, 16))
                 {
                     aes.Decrypt(iv, cipher, tag, plain);
                 }
 
-                // UTF-8 •¶š—ñ‚Æ‚µ‚ÄƒpƒXƒ[ƒh‚ğ•œŒ³
+                // UTF-8 æ–‡å­—åˆ—ã¨ã—ã¦ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’å¾©å…ƒ
                 var pwd = Encoding.UTF8.GetString(plain);
 
-                // V‚µ‚¢ Credential ‚ğ\’zi‚±‚±‚Å‚Í DB •Û‘¶‚Í•½•¶‚Å•Û‘¶‚µAˆÃ†‰»ƒtƒ‰ƒO‚àŒ³ƒf[ƒ^‚ğˆø‚«Œp‚®j
+                // æ–°ã—ã„ Credential ã‚’æ§‹ç¯‰ï¼ˆã“ã“ã§ã¯ DB ä¿å­˜æ™‚ã¯å¹³æ–‡ã§ä¿å­˜ã—ã€æš—å·åŒ–ãƒ•ãƒ©ã‚°ã‚‚å…ƒãƒ‡ãƒ¼ã‚¿ã‚’å¼•ãç¶™ãï¼‰
                 var c = new Models.Credential
                 {
                     LoginId = rec.LoginId,
@@ -249,7 +249,7 @@ namespace potetofly25.KeyManager2.Services
                     IsEncrypted = rec.IsEncrypted
                 };
 
-                // DB ‚É’Ç‰Ái‚±‚±‚Å‚Í encryptPassword: false ‚Æ‚µ‚Ä•½•¶•Û‘¶j
+                // DB ã«è¿½åŠ ï¼ˆã“ã“ã§ã¯ encryptPassword: false ã¨ã—ã¦å¹³æ–‡ä¿å­˜ï¼‰
                 svc.Add(c, encryptPassword: false);
             }
         }

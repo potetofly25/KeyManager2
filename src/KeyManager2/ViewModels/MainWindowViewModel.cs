@@ -1,192 +1,179 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+ï»¿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using potetofly25.KeyManager2.Models;
 using potetofly25.KeyManager2.Services;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace potetofly25.KeyManager2.ViewModels
 {
     /// <summary>
-    /// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ÌƒƒCƒ“ƒEƒBƒ“ƒhƒE‚É‘Î‰‚·‚é ViewModel ƒNƒ‰ƒX‚Å‚·B
-    /// ‘Šiî•ñˆê——‚Ìæ“¾AŒŸõAƒJƒeƒSƒŠƒtƒBƒ‹ƒ^ƒŠƒ“ƒOAƒ^ƒOŒó•âæ“¾‚È‚Ç‚ÌƒvƒŒƒ[ƒ“ƒe[ƒVƒ‡ƒ“ƒƒWƒbƒN‚ğ’S“–‚µ‚Ü‚·B
+    /// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®ãƒ¡ã‚¤ãƒ³ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«å¯¾å¿œã™ã‚‹ ViewModel ã‚¯ãƒ©ã‚¹ã§ã™ã€‚
+    /// è³‡æ ¼æƒ…å ±ä¸€è¦§ã®å–å¾—ã€æ¤œç´¢ã€ã‚«ãƒ†ã‚´ãƒªãƒ•ã‚£ãƒ«ã‚¿ãƒªãƒ³ã‚°ã€ã‚¿ã‚°å€™è£œå–å¾—ãªã©ã®ãƒ—ãƒ¬ã‚¼ãƒ³ãƒ†ãƒ¼ã‚·ãƒ§ãƒ³ãƒ­ã‚¸ãƒƒã‚¯ã‚’æ‹…å½“ã—ã¾ã™ã€‚
     /// </summary>
     public partial class MainWindowViewModel : ObservableObject
     {
         /// <summary>
-        /// ‘Šiî•ñƒf[ƒ^‚ÉƒAƒNƒZƒX‚·‚é‚½‚ß‚ÌƒT[ƒrƒX‚Å‚·B
-        /// DB ‚©‚ç‚Ìæ“¾A’Ç‰ÁAXVAíœ‚ğƒJƒvƒZƒ‹‰»‚µ‚Ä‚¢‚Ü‚·B
+        /// è³‡æ ¼æƒ…å ±ãƒ‡ãƒ¼ã‚¿ã«ã‚¢ã‚¯ã‚»ã‚¹ã™ã‚‹ãŸã‚ã®ã‚µãƒ¼ãƒ“ã‚¹ã§ã™ã€‚
+        /// DB ã‹ã‚‰ã®å–å¾—ã€è¿½åŠ ã€æ›´æ–°ã€å‰Šé™¤ã‚’ã‚«ãƒ—ã‚»ãƒ«åŒ–ã—ã¦ã„ã¾ã™ã€‚
         /// </summary>
-        private readonly CredentialService _svc = new();
+        private readonly CredentialService credentialService;
 
         /// <summary>
-        /// ‰æ–Ê‚É•\¦‚·‚é‘Šiî•ñ‚Ìˆê——‚Å‚·B
-        /// ŒŸõ‚âƒJƒeƒSƒŠƒtƒBƒ‹ƒ^‚É‚æ‚Á‚Ä“à—e‚ª•Ï‰»‚µ‚Ü‚·B
-        /// </summary>
-        [ObservableProperty]
-        private List<Credential> credentials = [];
-
-        /// <summary>
-        /// ŒŸõƒ{ƒbƒNƒX‚É“ü—Í‚³‚ê‚½ŒŸõ•¶š—ñ‚Å‚·B
-        /// LoginIdADescriptionATags ‚É‘Î‚µ‚Ä•”•ªˆê’vŒŸõ‚ğs‚¢‚Ü‚·B
+        /// ç”»é¢ã«è¡¨ç¤ºã™ã‚‹è³‡æ ¼æƒ…å ±ã®ä¸€è¦§ã§ã™ã€‚
+        /// æ¤œç´¢ã‚„ã‚«ãƒ†ã‚´ãƒªãƒ•ã‚£ãƒ«ã‚¿ã«ã‚ˆã£ã¦å†…å®¹ãŒå¤‰åŒ–ã—ã¾ã™ã€‚
         /// </summary>
         [ObservableProperty]
-        private string searchText = string.Empty;
+        private ObservableCollection<Credential> credentials;
 
         /// <summary>
-        /// ‘I‘ğ’†‚ÌƒJƒeƒSƒŠ–¼‚Å‚·B
-        /// ‚±‚ÌƒJƒeƒSƒŠ‚Éˆê’v‚·‚é‘Šiî•ñ‚Ì‚İ‚ğ•\¦‚µ‚Ü‚·B
+        /// åˆ©ç”¨å¯èƒ½ãªã‚«ãƒ†ã‚´ãƒªã®ä¸€è¦§ã§ã™ã€‚
+        /// æ—¢å­˜ã®è³‡æ ¼æƒ…å ±ã‹ã‚‰ä¸€æ„ãªã‚«ãƒ†ã‚´ãƒªã‚’æŠ½å‡ºã—ã¦æ§‹ç¯‰ã•ã‚Œã¾ã™ã€‚
+        /// </summary>
+        [ObservableProperty]
+        private ObservableCollection<string> categories;
+
+        /// <summary>
+        /// æ¤œç´¢ãƒœãƒƒã‚¯ã‚¹ã«å…¥åŠ›ã•ã‚ŒãŸæ¤œç´¢æ–‡å­—åˆ—ã§ã™ã€‚
+        /// LoginIdã€Descriptionã€Tags ã«å¯¾ã—ã¦éƒ¨åˆ†ä¸€è‡´æ¤œç´¢ã‚’è¡Œã„ã¾ã™ã€‚
+        /// </summary>
+        [ObservableProperty]
+        private string? searchText = string.Empty;
+
+        /// <summary>
+        /// é¸æŠä¸­ã®ã‚«ãƒ†ã‚´ãƒªåã§ã™ã€‚
+        /// ã“ã®ã‚«ãƒ†ã‚´ãƒªã«ä¸€è‡´ã™ã‚‹è³‡æ ¼æƒ…å ±ã®ã¿ã‚’è¡¨ç¤ºã—ã¾ã™ã€‚
         /// </summary>
         [ObservableProperty]
         private string? selectedCategory;
 
         /// <summary>
-        /// —˜—p‰Â”\‚ÈƒJƒeƒSƒŠ‚Ìˆê——‚Å‚·B
-        /// Šù‘¶‚Ì‘Šiî•ñ‚©‚çˆêˆÓ‚ÈƒJƒeƒSƒŠ‚ğ’Šo‚µ‚Ä\’z‚³‚ê‚Ü‚·B
+        /// ä¸€è¦§ã®å…ƒãƒ‡ãƒ¼ã‚¿ã¨ã—ã¦ä¿æŒã—ã¦ã„ã‚‹å…¨è³‡æ ¼æƒ…å ±ã®ãƒªã‚¹ãƒˆã§ã™ã€‚
+        /// ãƒ•ã‚£ãƒ«ã‚¿ã®é©ç”¨å‰ãƒ‡ãƒ¼ã‚¿ã¨ã—ã¦ä½¿ç”¨ã—ã¾ã™ã€‚
         /// </summary>
-        [ObservableProperty]
-        private List<string> categories = [];
+        private List<Credential> allCredentials;
 
         /// <summary>
-        /// <see cref="MainWindowViewModel"/> ‚ÌV‚µ‚¢ƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‰Šú‰»‚µ‚Ü‚·B
-        /// ƒRƒ“ƒXƒgƒ‰ƒNƒ^“à‚Å‘Šiî•ñ‚Ì“Ç‚İ‚İ‚ÆƒJƒeƒSƒŠˆê——‚Ì\’z‚ğs‚¢‚Ü‚·B
+        /// <see cref="MainWindowViewModel"/> ã®æ–°ã—ã„ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’åˆæœŸåŒ–ã—ã¾ã™ã€‚
+        /// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿å†…ã§è³‡æ ¼æƒ…å ±ã®èª­ã¿è¾¼ã¿ã¨ã‚«ãƒ†ã‚´ãƒªä¸€è¦§ã®æ§‹ç¯‰ã‚’è¡Œã„ã¾ã™ã€‚
         /// </summary>
-        public MainWindowViewModel()
+        /// <param name="credentialService">
+        /// è³‡æ ¼æƒ…å ±ã®å–å¾—ãƒ»æ›´æ–°ã‚’è¡Œã†ãŸã‚ã® <see cref="CredentialService"/> ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã§ã™ã€‚
+        /// </param>
+        public MainWindowViewModel(CredentialService credentialService)
         {
-            // ‰Šúƒ[ƒh‚ğÀs
-            Load();
+            // ã‚µãƒ¼ãƒ“ã‚¹ã®å‚ç…§ã‚’ä¿æŒ
+            this.credentialService = credentialService;
+
+            // ã‚³ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ã®åˆæœŸåŒ–
+            this.credentials = [];
+            this.categories = [];
+            this.allCredentials = [];
+
+            // â˜…èµ·å‹•æ™‚ã«ä¸€åº¦ä¸€è¦§ã‚’èª­ã¿è¾¼ã‚€
+            this.Refresh();
         }
 
         /// <summary>
-        /// ‘Šiî•ñ‚ğƒT[ƒrƒX‚©‚ç‘SŒæ“¾‚µA‰æ–Ê—pƒvƒƒpƒeƒB‚Öİ’è‚µ‚Ü‚·B
-        /// æ“¾‚É‚ÍAƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ªİ’è‚³‚ê‚Ä‚¢‚éê‡‚ÉŒÀ‚è•œ†‚ğs‚µ‚Ü‚·B
-        /// •¹‚¹‚ÄƒJƒeƒSƒŠˆê——‚àÄ\’z‚µ‚Ü‚·B
-        /// </summary>
-        public void Load()
-        {
-            // Œ»İ‚Ìƒ}ƒXƒ^[ƒpƒXƒ[ƒhó‘Ô‚É‰‚¶‚Ä•œ†‚ğ‚İ‚Â‚ÂA‘SŒæ“¾
-            Credentials = _svc.GetAll(tryDecrypt: AdvancedEncryptionService.IsMasterSet);
-
-            // ‘Šiî•ñ‚©‚çƒJƒeƒSƒŠˆê——‚ğÄ\’z
-            BuildCategories();
-        }
-
-        /// <summary>
-        /// Œ»İ‚Ì‘Šiî•ñˆê——‚©‚çƒJƒeƒSƒŠˆê——‚ğ\’z‚µ‚Ü‚·B
-        /// ƒJƒeƒSƒŠ‚ª null ‚Ü‚½‚Í‹ó‚Ìê‡‚Í "Uncategorized" ‚Æ‚µ‚Äˆµ‚¢‚Ü‚·B
-        /// </summary>
-        private void BuildCategories()
-        {
-            // ƒJƒeƒSƒŠ‚ğæ‚èo‚µAnull ‚Ìê‡‚Í "Uncategorized" ‚Æ‚µ‚Äˆµ‚Á‚½ã‚ÅˆêˆÓ‚Éƒ\[ƒg
-            var cats = Credentials
-                .Select(c => c.Category ?? "Uncategorized")
-                .Distinct()
-                .OrderBy(x => x)
-                .ToList();
-
-            Categories = cats;
-        }
-
-        /// <summary>
-        /// <see cref="SearchText"/> ƒvƒƒpƒeƒB•ÏX‚ÉŒÄ‚Ño‚³‚ê‚é•”•ªƒƒ\ƒbƒh‚Å‚·B
-        /// ŒŸõ•¶š—ñ‚ª•ÏX‚³‚ê‚é‚½‚Ñ‚ÉƒtƒBƒ‹ƒ^ˆ—‚ğÄ“K—p‚µ‚Ü‚·B
-        /// </summary>
-        /// <param name="value">V‚µ‚¢ŒŸõ•¶š—ñB</param>
-        partial void OnSearchTextChanged(string value)
-        {
-            // ŒŸõ•¶š—ñ‚ª•ÏX‚³‚ê‚½ê‡‚ÍƒtƒBƒ‹ƒ^‚ğÄ“K—p
-            ApplyFilter();
-        }
-
-        /// <summary>
-        /// <see cref="SelectedCategory"/> ƒvƒƒpƒeƒB•ÏX‚ÉŒÄ‚Ño‚³‚ê‚é•”•ªƒƒ\ƒbƒh‚Å‚·B
-        /// ‘I‘ğƒJƒeƒSƒŠ‚ª•ÏX‚³‚ê‚é‚½‚Ñ‚ÉƒtƒBƒ‹ƒ^ˆ—‚ğÄ“K—p‚µ‚Ü‚·B
-        /// </summary>
-        /// <param name="value">V‚µ‚­‘I‘ğ‚³‚ê‚½ƒJƒeƒSƒŠ–¼B</param>
-        partial void OnSelectedCategoryChanged(string? value)
-        {
-            // ‘I‘ğƒJƒeƒSƒŠ‚ª•ÏX‚³‚ê‚½ê‡‚ÍƒtƒBƒ‹ƒ^‚ğÄ“K—p
-            ApplyFilter();
-        }
-
-        /// <summary>
-        /// ‘Šiî•ñˆê——‚ğÄ“Ç‚İ‚İ‚·‚éƒRƒ}ƒ“ƒh‚Å‚·B
-        /// DB ‚©‚çÄæ“¾‚µAƒJƒeƒSƒŠˆê——‚àXV‚³‚ê‚Ü‚·B
+        /// DB ã‹ã‚‰è³‡æ ¼æƒ…å ±ã‚’å†å–å¾—ã—ã€ã‚«ãƒ†ã‚´ãƒªä¸€è¦§ã¨ãƒ•ã‚£ãƒ«ã‚¿æ¸ˆã¿ä¸€è¦§ã‚’æ›´æ–°ã—ã¾ã™ã€‚
         /// </summary>
         [RelayCommand]
         private void Refresh()
         {
-            // ÅV‚Ìó‘Ô‚ÅÄ“Ç‚İ‚İ
-            Load();
+            // â˜…DB ã‹ã‚‰å…¨è³‡æ ¼æƒ…å ±ã‚’å–å¾—ï¼ˆå¾©å·ã—ãŸçŠ¶æ…‹ã§æ¬²ã—ã‘ã‚Œã° true / false ã‚’å¿…è¦ã«å¿œã˜ã¦å¤‰æ›´ï¼‰
+            this.allCredentials = this.credentialService.GetAll(tryDecrypt: true).ToList();
+
+            // ãƒ•ã‚£ãƒ«ã‚¿ã‚’é©ç”¨ã—ã¦ç”»é¢è¡¨ç¤ºç”¨ã‚³ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ã‚’æ›´æ–°
+            this.ApplyFilter();
+
+            // ã‚«ãƒ†ã‚´ãƒªä¸€è¦§ã‚‚æ›´æ–°
+            this.UpdateCategories();
         }
 
         /// <summary>
-        /// Œ»İ‚ÌŒŸõğŒi<see cref="SearchText"/> ‚Æ <see cref="SelectedCategory"/>j‚ÉŠî‚Ã‚«A
-        /// •\¦—p‚Ì <see cref="Credentials"/> ‚ğƒtƒBƒ‹ƒ^ƒŠƒ“ƒO‚µ‚Ü‚·B
+        /// ç¾åœ¨ã®æ¤œç´¢ãƒ†ã‚­ã‚¹ãƒˆãŠã‚ˆã³ã‚«ãƒ†ã‚´ãƒªã‚’ä½¿ã£ã¦ä¸€è¦§ã‚’ãƒ•ã‚£ãƒ«ã‚¿ãƒªãƒ³ã‚°ã—ã€
+        /// <see cref="Credentials"/> ã‚³ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ã‚’æ›´æ–°ã—ã¾ã™ã€‚
         /// </summary>
+        [RelayCommand]
         public void ApplyFilter()
         {
-            // –ˆ‰ñ DB ‚©‚çV‚½‚Éæ“¾i•œ†‚Ì‰Â”Û‚ÍŒ»İ‚Ìƒ}ƒXƒ^[ó‘Ô‚É‚æ‚éj
-            var q = _svc.GetAll(tryDecrypt: AdvancedEncryptionService.IsMasterSet).AsEnumerable();
+            // å…ƒãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ã‚¯ã‚¨ãƒªã‚’é–‹å§‹
+            IEnumerable<Credential> query = this.allCredentials;
 
-            // ƒJƒeƒSƒŠ‚ªw’è‚³‚ê‚Ä‚¢‚éê‡A‚»‚ÌƒJƒeƒSƒŠ‚Éˆê’v‚·‚é‚à‚Ì‚¾‚¯‚Éi‚è‚İ
-            if (!string.IsNullOrWhiteSpace(SelectedCategory))
+            // ã‚«ãƒ†ã‚´ãƒªã§ãƒ•ã‚£ãƒ«ã‚¿ï¼ˆSelectedCategory ãŒç©ºã§ãªã„å ´åˆã®ã¿ï¼‰
+            if (!string.IsNullOrWhiteSpace(this.SelectedCategory))
             {
-                q = q.Where(c => (c.Category ?? "Uncategorized") == SelectedCategory);
+                query = query.Where(c => string.Equals(c.Category, this.SelectedCategory, System.StringComparison.OrdinalIgnoreCase));
             }
 
-            // ŒŸõ•¶š—ñ‚ªw’è‚³‚ê‚Ä‚¢‚éê‡ALoginId / Description / Tags ‚É‘Î‚µ‚Ä•”•ªˆê’vŒŸõ
-            if (!string.IsNullOrWhiteSpace(SearchText))
+            // æ¤œç´¢ãƒ†ã‚­ã‚¹ãƒˆã§ãƒ•ã‚£ãƒ«ã‚¿
+            if (!string.IsNullOrWhiteSpace(this.SearchText))
             {
-                var s = SearchText.ToLowerInvariant();
+                string keyword = this.SearchText.Trim();
 
-                q = q.Where(c =>
-                    (c.LoginId ?? string.Empty).Contains(s, System.StringComparison.InvariantCultureIgnoreCase)
-                    || (c.Description ?? string.Empty).Contains(s, System.StringComparison.InvariantCultureIgnoreCase)
-                    || (c.Tags ?? string.Empty).Contains(s, System.StringComparison.InvariantCultureIgnoreCase));
+                query = query.Where(c =>
+                    (!string.IsNullOrEmpty(c.LoginId) && c.LoginId.Contains(keyword, System.StringComparison.OrdinalIgnoreCase)) ||
+                    (!string.IsNullOrEmpty(c.Description) && c.Description.Contains(keyword, System.StringComparison.OrdinalIgnoreCase)) ||
+                    (!string.IsNullOrEmpty(c.Tags) && c.Tags.Contains(keyword, System.StringComparison.OrdinalIgnoreCase)));
             }
 
-            // Œ‹‰Ê‚ğ List ‚É‚µ‚Ä Credentials ‚ğXViC# 12 ‚ÌƒRƒŒƒNƒVƒ‡ƒ“®‚ğg—pj
-            Credentials = [.. q];
+            // ç”»é¢è¡¨ç¤ºç”¨ã‚³ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ã‚’æ›´æ–°
+            this.Credentials.Clear();
+            foreach (Credential item in query)
+            {
+                this.Credentials.Add(item);
+            }
         }
 
         /// <summary>
-        /// “o˜^‚³‚ê‚Ä‚¢‚é‚·‚×‚Ä‚Ì <see cref="Credential.Tags"/> ‚©‚çƒ^ƒOŒó•âˆê——‚ğæ“¾‚µ‚Ü‚·B
-        /// ƒ^ƒO‚Ìg—p•p“x‚ª‚‚¢‡‚Éƒ\[ƒg‚³‚ê‚½Œó•âƒŠƒXƒg‚ğ•Ô‚µ‚Ü‚·B
+        /// ç™»éŒ²æ¸ˆã¿è³‡æ ¼æƒ…å ±ã‹ã‚‰ã‚«ãƒ†ã‚´ãƒªä¸€è¦§ã‚’ä½œæˆã—ã€<see cref="Categories"/> ã‚’æ›´æ–°ã—ã¾ã™ã€‚
         /// </summary>
-        /// <returns>•p“x~‡‚É•À‚ñ‚¾ƒ^ƒO•¶š—ñ‚Ìˆê——B</returns>
+        private void UpdateCategories()
+        {
+            // é‡è¤‡ã‚’é™¤ã„ãŸã‚«ãƒ†ã‚´ãƒªä¸€è¦§ã‚’ç”Ÿæˆ
+            IEnumerable<string> categoryList = this.allCredentials
+                .Where(c => !string.IsNullOrWhiteSpace(c.Category))
+                .Select(c => c.Category!)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(c => c);
+
+            this.Categories.Clear();
+            foreach (string category in categoryList)
+            {
+                this.Categories.Add(category);
+            }
+        }
+
+        /// <summary>
+        /// ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹å…¨ã¦ã®ã‚¿ã‚°å€™è£œã‚’è¿”ã—ã¾ã™ã€‚
+        /// ã‚¿ã‚°ã‚¯ãƒ©ã‚¦ãƒ‰æ§‹ç¯‰ç”¨ã«ä½¿ç”¨ã•ã‚Œã¾ã™ã€‚
+        /// </summary>
+        /// <returns>ã‚¿ã‚°æ–‡å­—åˆ—ã®ãƒªã‚¹ãƒˆã§ã™ã€‚</returns>
         public List<string> GetAllTagCandidates()
         {
-            // ƒpƒXƒ[ƒh•œ†‚Í•s—v‚È‚Ì‚Å tryDecrypt: false ‚Å‘SŒæ“¾
-            var all = _svc.GetAll(tryDecrypt: false);
+            List<string> result = [];
 
-            // ƒ^ƒO‚Æ‚»‚ÌoŒ»‰ñ”‚ğ•Û‚·‚éƒ}ƒbƒvi‘å•¶š¬•¶š‚ğ‹æ•Ê‚µ‚È‚¢j
-            var map = new Dictionary<string, int>(System.StringComparer.OrdinalIgnoreCase);
-
-            foreach (var c in all)
+            foreach (Credential credential in this.allCredentials)
             {
-                // Tags ‚ª‹ó‚Ü‚½‚Í null ‚Ìê‡‚ÍƒXƒLƒbƒv
-                if (string.IsNullOrWhiteSpace(c.Tags))
+                if (string.IsNullOrWhiteSpace(credential.Tags))
                 {
                     continue;
                 }
 
-                // ƒJƒ“ƒ}‹æØ‚è‚Åƒ^ƒO‚ğ•ªŠ„EƒgƒŠƒ€‚µ‚ÄWŒv
-                foreach (var t in c.Tags.Split(',', System.StringSplitOptions.RemoveEmptyEntries | System.StringSplitOptions.TrimEntries))
+                string[] tokens = credential.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                foreach (string token in tokens)
                 {
-                    if (map.TryGetValue(t, out int value))
+                    if (!result.Contains(token, StringComparer.OrdinalIgnoreCase))
                     {
-                        map[t] = ++value;
-                    }
-                    else
-                    {
-                        map[t] = 1;
+                        result.Add(token);
                     }
                 }
             }
 
-            // oŒ»‰ñ”‚Ì‘½‚¢‡‚Éƒ^ƒO–¼‚¾‚¯‚ğæ‚èo‚µ‚ÄƒŠƒXƒg‰»
-            return [.. map.OrderByDescending(kv => kv.Value).Select(kv => kv.Key)];
+            return result;
         }
+
     }
 }

@@ -5,29 +5,29 @@ using potetofly25.KeyManager2.Models;
 namespace potetofly25.KeyManager2.Views
 {
     /// <summary>
-    /// ���i���ҏW�p�̃_�C�A���O�E�B���h�E�ł��B
-    /// �w�肳�ꂽ <see cref="Credential"/> �����Ƃ� <see cref="EditCredentialViewModel"/> �𐶐����A
-    /// DataContext �Ƀo�C���h���܂��B
+    /// 資格情報編集用のダイアログウィンドウです。
+    /// 指定された <see cref="Credential"/> をもとに <see cref="EditCredentialViewModel"/> を生成し、
+    /// DataContext にバインドします。
     /// </summary>
     public partial class EditCredentialWindow : Window
     {
         /// <summary>
-        /// ���̃E�B���h�E�Ƀo�C���h����Ă��� <see cref="EditCredentialViewModel"/> ���擾���܂��B
-        /// DataContext �� <see cref="EditCredentialViewModel"/> �̏ꍇ�̂ݎQ�Ƃł��܂��B
+        /// このウィンドウにバインドされている <see cref="EditCredentialViewModel"/> を取得します。
+        /// DataContext が <see cref="EditCredentialViewModel"/> の場合のみ参照できます。
         /// </summary>
         public EditCredentialViewModel ViewModel => DataContext as EditCredentialViewModel;
 
         /// <summary>
-        /// <see cref="EditCredentialWindow"/> �̐V�����C���X�^���X�����������܂��B
-        /// �󂯎���� <see cref="Credential"/> �����Ƃ� ViewModel �𐶐����ADataContext �֐ݒ肵�܂��B
+        /// <see cref="EditCredentialWindow"/> の新しいインスタンスを初期化します。
+        /// 受け取った <see cref="Credential"/> をもとに ViewModel を生成し、DataContext へ設定します。
         /// </summary>
-        /// <param name="c">�ҏW�ΏۂƂȂ鎑�i���I�u�W�F�N�g�B</param>
+        /// <param name="c">編集対象となる資格情報オブジェクト。</param>
         public EditCredentialWindow(Credential c)
         {
-            // �E�B���h�E�R���|�[�l���g��������
+            // ウィンドウコンポーネントを初期化
             InitializeComponent();
 
-            // ViewModel �𐶐����ADataContext �ɐݒ�
+            // ViewModel を生成し、DataContext に設定
             DataContext = new EditCredentialViewModel(c);
         }
     }

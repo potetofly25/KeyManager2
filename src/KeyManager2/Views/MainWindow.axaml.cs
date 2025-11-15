@@ -1,41 +1,38 @@
-using Avalonia.Controls;
+ï»¿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using potetofly25.KeyManager2.Models;
 using potetofly25.KeyManager2.Services;
 using potetofly25.KeyManager2.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace potetofly25.KeyManager2.Views
 {
     /// <summary>
-    /// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ÌƒƒCƒ“ƒEƒBƒ“ƒhƒE‚ğ•\‚·ƒNƒ‰ƒX‚Å‚·B
-    /// ˆê——•\¦A•ÒWAV‹Kì¬AíœAƒRƒs[Aƒ}ƒXƒ^[ƒpƒXƒ[ƒhİ’èA
-    /// ƒGƒNƒXƒ|[ƒg^ƒCƒ“ƒ|[ƒgA‚¨‚æ‚Ñƒ^ƒOƒNƒ‰ƒEƒh‚Ì\’z‚È‚Ç‚Ì UI ƒƒWƒbƒN‚ğ’S“–‚µ‚Ü‚·B
+    /// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®ãƒ¡ã‚¤ãƒ³ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹ã§ã™ã€‚
+    /// ä¸€è¦§è¡¨ç¤ºã€ç·¨é›†ã€æ–°è¦ä½œæˆã€å‰Šé™¤ã€ã‚³ãƒ”ãƒ¼ã€ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰è¨­å®šã€
+    /// ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆï¼ã‚¤ãƒ³ãƒãƒ¼ãƒˆã€ãŠã‚ˆã³ã‚¿ã‚°ã‚¯ãƒ©ã‚¦ãƒ‰ã®æ§‹ç¯‰ãªã©ã® UI ãƒ­ã‚¸ãƒƒã‚¯ã‚’æ‹…å½“ã—ã¾ã™ã€‚
     /// </summary>
     public partial class MainWindow : Window
     {
         /// <summary>
-        /// ‚±‚ÌƒEƒBƒ“ƒhƒE‚ÉƒoƒCƒ“ƒh‚³‚ê‚Ä‚¢‚é <see cref="MainWindowViewModel"/> ‚ğæ“¾‚µ‚Ü‚·B
-        /// DataContext ‚ª <see cref="MainWindowViewModel"/> ‚Ìê‡‚É‚Ì‚İ—LŒø‚ÈQÆ‚Æ‚È‚è‚Ü‚·B
-        /// </summary>
-        private MainWindowViewModel? Vm => DataContext as MainWindowViewModel;
-
-        /// <summary>
-        /// ‘Šiî•ñ‚É‘Î‚·‚éƒf[ƒ^‘€ìiæ“¾E’Ç‰ÁEXVEíœj‚ğs‚¤ƒT[ƒrƒX‚Å‚·B
+        /// è³‡æ ¼æƒ…å ±ã«å¯¾ã™ã‚‹ãƒ‡ãƒ¼ã‚¿æ“ä½œï¼ˆå–å¾—ãƒ»è¿½åŠ ãƒ»æ›´æ–°ãƒ»å‰Šé™¤ï¼‰ã‚’è¡Œã†ã‚µãƒ¼ãƒ“ã‚¹ã§ã™ã€‚
         /// </summary>
         private readonly CredentialService _svc = new();
 
         /// <summary>
-        /// <see cref="MainWindow"/> ‚ÌV‚µ‚¢ƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‰Šú‰»‚µ‚Ü‚·B
-        /// ƒRƒ“ƒ|[ƒlƒ“ƒg‰Šú‰»Œã‚ÉŠeíƒ{ƒ^ƒ“‚ÌƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰‚¨‚æ‚Ñƒ^ƒOƒNƒ‰ƒEƒh‚Ì\’z‚ğs‚¢‚Ü‚·B
+        /// <see cref="MainWindow"/> ã®æ–°ã—ã„ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’åˆæœŸåŒ–ã—ã¾ã™ã€‚
+        /// ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆåˆæœŸåŒ–å¾Œã«å„ç¨®ãƒœã‚¿ãƒ³ã®ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©ãŠã‚ˆã³ã‚¿ã‚°ã‚¯ãƒ©ã‚¦ãƒ‰ã®æ§‹ç¯‰ã‚’è¡Œã„ã¾ã™ã€‚
         /// </summary>
         public MainWindow()
         {
-            // XAML ‚Å’è‹`‚³‚ê‚½ƒRƒ“ƒ|[ƒlƒ“ƒg‚ğ‰Šú‰»
+            // XAML ã§å®šç¾©ã•ã‚ŒãŸã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’åˆæœŸåŒ–
             InitializeComponent();
 
-            // ƒRƒ“ƒgƒ[ƒ‹‚ÌQÆ‚ğæ“¾
+            var Vm = this.DataContext as MainWindowViewModel;
+
+            // ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®å‚ç…§ã‚’å–å¾—
             var dg = this.FindControl<DataGrid>("DataGrid")!;
             var newBtn = this.FindControl<Button>("NewBtn")!;
             var editBtn = this.FindControl<Button>("EditBtn")!;
@@ -46,42 +43,42 @@ namespace potetofly25.KeyManager2.Views
             var importBtn = this.FindControl<Button>("ImportBtn")!;
             var tagPanel = this.FindControl<WrapPanel>("TagCloudPanel")!;
 
-            // V‹Kì¬ƒ{ƒ^ƒ“ƒNƒŠƒbƒNƒCƒxƒ“ƒg
+            // æ–°è¦ä½œæˆãƒœã‚¿ãƒ³ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆ
             newBtn.Click += async (_, __) =>
             {
-                // V‚µ‚¢ Credential ƒIƒuƒWƒFƒNƒg‚ğì¬iƒfƒtƒHƒ‹ƒg LoginId ‚Éƒ^ƒCƒ€ƒXƒ^ƒ“ƒv‚ğ•t—^j
+                // æ–°ã—ã„ Credential ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆï¼ˆãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ LoginId ã«ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—ã‚’ä»˜ä¸ï¼‰
                 var cred = new Credential
                 {
                     LoginId = $"user{System.DateTime.Now.Ticks}"
                 };
 
-                // •ÒWƒ_ƒCƒAƒƒO‚ğŠJ‚­
+                // ç·¨é›†ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‹ã
                 var win = new EditCredentialWindow(cred);
                 var res = await win.ShowDialog<bool?>(this);
 
                 if (res == true)
                 {
-                    // ƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ªİ’è‚³‚ê‚Ä‚¢‚éê‡‚ÍˆÃ†‰»‚ğ—LŒø‚É‚·‚é
+                    // ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã¯æš—å·åŒ–ã‚’æœ‰åŠ¹ã«ã™ã‚‹
                     var encrypt = AdvancedEncryptionService.IsMasterSet;
 
-                    // •ÒWŒ‹‰Ê‚ğ DB ‚É’Ç‰Á
+                    // ç·¨é›†çµæœã‚’ DB ã«è¿½åŠ 
                     _svc.Add(win.ViewModel.Credential, encryptPassword: encrypt);
 
-                    // ˆê——‚ÌXV
+                    // ä¸€è¦§ã®æ›´æ–°
                     Vm?.RefreshCommand.Execute(null);
                 }
             };
 
-            // •ÒWƒ{ƒ^ƒ“ƒNƒŠƒbƒNƒCƒxƒ“ƒg
+            // ç·¨é›†ãƒœã‚¿ãƒ³ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆ
             editBtn.Click += async (_, __) =>
             {
-                // DataGrid ‚Å‘I‘ğ‚³‚ê‚Ä‚¢‚és‚ª Credential ‚Å‚È‚¯‚ê‚Î‰½‚à‚µ‚È‚¢
+                // DataGrid ã§é¸æŠã•ã‚Œã¦ã„ã‚‹è¡ŒãŒ Credential ã§ãªã‘ã‚Œã°ä½•ã‚‚ã—ãªã„
                 if (dg.SelectedItem is not Credential sel)
                 {
                     return;
                 }
 
-                // •ÒW—p‚ÉƒRƒs[‚ğì¬i’¼ÚƒoƒCƒ“ƒh‚µ‚Ä‚¢‚éƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‘‚«Š·‚¦‚È‚¢‚½‚ßj
+                // ç·¨é›†ç”¨ã«ã‚³ãƒ”ãƒ¼ã‚’ä½œæˆï¼ˆç›´æ¥ãƒã‚¤ãƒ³ãƒ‰ã—ã¦ã„ã‚‹ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’æ›¸ãæ›ãˆãªã„ãŸã‚ï¼‰
                 var copy = new Credential
                 {
                     Id = sel.Id,
@@ -93,7 +90,7 @@ namespace potetofly25.KeyManager2.Views
                     IsEncrypted = sel.IsEncrypted
                 };
 
-                // ˆÃ†‰»Ï‚İ‚©‚Âƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ªİ’è‚³‚ê‚Ä‚¢‚éê‡‚ÍA•ÒW‚µ‚â‚·‚¢‚æ‚¤‚É•œ†‚µ‚Ä‚¨‚­
+                // æš—å·åŒ–æ¸ˆã¿ã‹ã¤ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ã€ç·¨é›†ã—ã‚„ã™ã„ã‚ˆã†ã«å¾©å·ã—ã¦ãŠã
                 if (copy.IsEncrypted && AdvancedEncryptionService.IsMasterSet)
                 {
                     try
@@ -102,48 +99,48 @@ namespace potetofly25.KeyManager2.Views
                     }
                     catch
                     {
-                        // •œ†‚É¸”s‚µ‚½ê‡‚Í‚»‚Ì‚Ü‚ÜˆÃ†‰»•¶š—ñ‚ğ•\¦
+                        // å¾©å·ã«å¤±æ•—ã—ãŸå ´åˆã¯ãã®ã¾ã¾æš—å·åŒ–æ–‡å­—åˆ—ã‚’è¡¨ç¤º
                     }
                 }
 
-                // •ÒWƒ_ƒCƒAƒƒO‚ğŠJ‚­
+                // ç·¨é›†ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‹ã
                 var win = new EditCredentialWindow(copy);
                 var res = await win.ShowDialog<bool?>(this);
 
                 if (res == true)
                 {
-                    // Œ»İ‚Ìƒ}ƒXƒ^[ƒpƒXƒ[ƒhó‘Ô‚É‰‚¶‚Ä•Û‘¶‚ÉˆÃ†‰»‚·‚é‚©‚Ç‚¤‚©‚ğŒˆ’è
+                    // ç¾åœ¨ã®ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰çŠ¶æ…‹ã«å¿œã˜ã¦ä¿å­˜æ™‚ã«æš—å·åŒ–ã™ã‚‹ã‹ã©ã†ã‹ã‚’æ±ºå®š
                     var encrypt = AdvancedEncryptionService.IsMasterSet;
 
-                    // XVˆ—iDB ”½‰fj
+                    // æ›´æ–°å‡¦ç†ï¼ˆDB åæ˜ ï¼‰
                     _svc.Update(win.ViewModel.Credential, encryptPassword: encrypt);
 
-                    // ˆê——‚ÌXV
+                    // ä¸€è¦§ã®æ›´æ–°
                     Vm?.RefreshCommand.Execute(null);
                 }
             };
 
-            // íœƒ{ƒ^ƒ“ƒNƒŠƒbƒNƒCƒxƒ“ƒg
+            // å‰Šé™¤ãƒœã‚¿ãƒ³ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆ
             deleteBtn.Click += (_, __) =>
             {
                 if (dg.SelectedItem is Credential sel)
                 {
-                    // ‘I‘ğ‚³‚ê‚½ Credential ‚ğíœ
+                    // é¸æŠã•ã‚ŒãŸ Credential ã‚’å‰Šé™¤
                     _svc.Delete(sel);
 
-                    // ˆê——‚ÌXV
+                    // ä¸€è¦§ã®æ›´æ–°
                     Vm?.RefreshCommand.Execute(null);
                 }
             };
 
-            // ƒRƒs[iƒpƒXƒ[ƒhƒRƒs[jƒ{ƒ^ƒ“ƒNƒŠƒbƒNƒCƒxƒ“ƒg
+            // ã‚³ãƒ”ãƒ¼ï¼ˆãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚³ãƒ”ãƒ¼ï¼‰ãƒœã‚¿ãƒ³ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆ
             copyBtn.Click += async (_, __) =>
             {
                 if (dg.SelectedItem is Credential sel)
                 {
                     var pwd = sel.Password;
 
-                    // ˆÃ†‰»Ï‚İ‚Åƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ªİ’è‚³‚ê‚Ä‚¢‚éê‡‚Í•œ†‚µ‚Ä‚©‚çƒNƒŠƒbƒvƒ{[ƒh‚Ö
+                    // æš—å·åŒ–æ¸ˆã¿ã§ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã¯å¾©å·ã—ã¦ã‹ã‚‰ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã¸
                     if (sel.IsEncrypted && AdvancedEncryptionService.IsMasterSet)
                     {
                         try
@@ -152,11 +149,11 @@ namespace potetofly25.KeyManager2.Views
                         }
                         catch
                         {
-                            // •œ†¸”s‚ÍˆÃ†‰»•¶š—ñ‚Ì‚Ü‚ÜƒRƒs[
+                            // å¾©å·å¤±æ•—æ™‚ã¯æš—å·åŒ–æ–‡å­—åˆ—ã®ã¾ã¾ã‚³ãƒ”ãƒ¼
                         }
                     }
 
-                    // Clipboard ‚Ìæ“¾iTopLevel ‚©‚çæ“¾‚·‚é•û–@‚ğg—pj
+                    // Clipboard ã®å–å¾—ï¼ˆTopLevel ã‹ã‚‰å–å¾—ã™ã‚‹æ–¹æ³•ã‚’ä½¿ç”¨ï¼‰
                     var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
                     if (clipboard != null)
                     {
@@ -165,10 +162,10 @@ namespace potetofly25.KeyManager2.Views
                 }
             };
 
-            // ƒ}ƒXƒ^[ƒpƒXƒ[ƒhİ’èƒ{ƒ^ƒ“ƒNƒŠƒbƒNƒCƒxƒ“ƒg
+            // ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰è¨­å®šãƒœã‚¿ãƒ³ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆ
             setMasterBtn.Click += async (_, __) =>
             {
-                // ƒ}ƒXƒ^[ƒpƒXƒ[ƒh“ü—Íƒ_ƒCƒAƒƒO‚ğ•\¦
+                // ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰å…¥åŠ›ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤º
                 var dlg = new MasterPasswordWindow();
                 var pwd = await dlg.ShowDialog<string?>(this);
 
@@ -176,21 +173,21 @@ namespace potetofly25.KeyManager2.Views
                 {
                     try
                     {
-                        // ‚·‚Å‚Éƒ‹[ƒgƒL[‚ª‘¶İ‚·‚é‚Æ‰¼’è‚µ‚ÄƒZƒbƒg‚ğ‚İ‚é
+                        // ã™ã§ã«ãƒ«ãƒ¼ãƒˆã‚­ãƒ¼ãŒå­˜åœ¨ã™ã‚‹ã¨ä»®å®šã—ã¦ã‚»ãƒƒãƒˆã‚’è©¦ã¿ã‚‹
                         AdvancedEncryptionService.SetMasterPassword(pwd);
                     }
                     catch
                     {
-                        // ¸”s‚µ‚½ê‡‚ÍV‹K‚Éƒ‹[ƒgƒL[‚ğ¶¬‚µ‚Ä‰Šú‰»
+                        // å¤±æ•—ã—ãŸå ´åˆã¯æ–°è¦ã«ãƒ«ãƒ¼ãƒˆã‚­ãƒ¼ã‚’ç”Ÿæˆã—ã¦åˆæœŸåŒ–
                         AdvancedEncryptionService.InitializeMasterPassword(pwd);
                     }
 
-                    // ƒ}ƒXƒ^[ƒpƒXƒ[ƒhİ’èŒã‚Éˆê——‚ğÄæ“¾iˆÃ†‰»^•œ†ó‘Ô‚ª•Ï‚í‚é‚½‚ßj
+                    // ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰è¨­å®šå¾Œã«ä¸€è¦§ã‚’å†å–å¾—ï¼ˆæš—å·åŒ–ï¼å¾©å·çŠ¶æ…‹ãŒå¤‰ã‚ã‚‹ãŸã‚ï¼‰
                     Vm?.RefreshCommand.Execute(null);
                 }
             };
 
-            // ƒGƒNƒXƒ|[ƒgƒ{ƒ^ƒ“ƒNƒŠƒbƒNƒCƒxƒ“ƒg
+            // ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆãƒœã‚¿ãƒ³ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆ
             exportBtn.Click += async (_, __) =>
             {
                 var fileType = new FilePickerFileType("KM2 Backup")
@@ -198,11 +195,11 @@ namespace potetofly25.KeyManager2.Views
                     Patterns = ["*.km2"]
                 };
 
-                // •Û‘¶ƒ_ƒCƒAƒƒO‚ğ•\¦
+                // ä¿å­˜ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤º
                 var saveResult = await this.StorageProvider.SaveFilePickerAsync(
                     new FilePickerSaveOptions
                     {
-                        Title = "ƒGƒNƒXƒ|[ƒgæ‚ğ‘I‘ğ",
+                        Title = "ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆå…ˆã‚’é¸æŠ",
                         FileTypeChoices = [fileType],
                         SuggestedFileName = "backup.km2"
                     });
@@ -211,19 +208,19 @@ namespace potetofly25.KeyManager2.Views
                 {
                     string? pwd = null;
 
-                    // ƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ª–¢İ’è‚Ìê‡AƒoƒbƒNƒAƒbƒv‚ğ•ÛŒì‚·‚é‚½‚ß‚ÌƒpƒXƒ[ƒh‚ğ“ü—Í‚³‚¹‚é
+                    // ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒæœªè¨­å®šã®å ´åˆã€ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã‚’ä¿è­·ã™ã‚‹ãŸã‚ã®ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’å…¥åŠ›ã•ã›ã‚‹
                     if (!AdvancedEncryptionService.IsMasterSet)
                     {
                         var ip = new SimplePasswordWindow("Enter export password (will be used to wrap backup)");
                         pwd = await ip.ShowDialog<string?>(this);
                     }
 
-                    // ƒpƒXƒ[ƒhi•K—v‚È‚çj•t‚«‚Å‘Sƒf[ƒ^‚ğƒGƒNƒXƒ|[ƒg
+                    // ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ï¼ˆå¿…è¦ãªã‚‰ï¼‰ä»˜ãã§å…¨ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆ
                     ExportImportService.ExportAll(saveResult.Path.LocalPath, pwd);
                 }
             };
 
-            // ƒCƒ“ƒ|[ƒgƒ{ƒ^ƒ“ƒNƒŠƒbƒNƒCƒxƒ“ƒg
+            // ã‚¤ãƒ³ãƒãƒ¼ãƒˆãƒœã‚¿ãƒ³ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆ
             importBtn.Click += async (_, __) =>
             {
                 var fileType = new FilePickerFileType("KM2 Backup")
@@ -231,11 +228,11 @@ namespace potetofly25.KeyManager2.Views
                     Patterns = ["*.km2"]
                 };
 
-                // ƒCƒ“ƒ|[ƒg‘ÎÛƒtƒ@ƒCƒ‹‚Ì‘I‘ğƒ_ƒCƒAƒƒO‚ğ•\¦
+                // ã‚¤ãƒ³ãƒãƒ¼ãƒˆå¯¾è±¡ãƒ•ã‚¡ã‚¤ãƒ«ã®é¸æŠãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤º
                 var openResult = await this.StorageProvider.OpenFilePickerAsync(
                     new FilePickerOpenOptions
                     {
-                        Title = "ƒCƒ“ƒ|[ƒg‚·‚éƒoƒbƒNƒAƒbƒvƒtƒ@ƒCƒ‹‚ğ‘I‘ğ",
+                        Title = "ã‚¤ãƒ³ãƒãƒ¼ãƒˆã™ã‚‹ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é¸æŠ",
                         FileTypeFilter = [fileType],
                         AllowMultiple = false
                     });
@@ -244,58 +241,74 @@ namespace potetofly25.KeyManager2.Views
                 {
                     string? pwd = null;
 
-                    // ƒ}ƒXƒ^[ƒpƒXƒ[ƒh‚ª–¢İ’è‚Ìê‡AƒoƒbƒNƒAƒbƒv‚ğƒAƒ“ƒ‰ƒbƒv‚·‚é‚½‚ß‚ÌƒpƒXƒ[ƒh‚ğ“ü—Í‚³‚¹‚é
+                    // ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒæœªè¨­å®šã®å ´åˆã€ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã‚’ã‚¢ãƒ³ãƒ©ãƒƒãƒ—ã™ã‚‹ãŸã‚ã®ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’å…¥åŠ›ã•ã›ã‚‹
                     if (!AdvancedEncryptionService.IsMasterSet)
                     {
                         var ip = new SimplePasswordWindow("Enter import password to unwrap backup");
                         pwd = await ip.ShowDialog<string?>(this);
                     }
 
-                    // w’èƒtƒ@ƒCƒ‹‚©‚ç‘Sƒf[ƒ^‚ğƒCƒ“ƒ|[ƒg
+                    // æŒ‡å®šãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰å…¨ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¤ãƒ³ãƒãƒ¼ãƒˆ
                     ExportImportService.ImportAll(openResult[0].Path.LocalPath, pwd);
 
-                    // ƒCƒ“ƒ|[ƒgŒã‚Éˆê——‚ğXV
+                    // ã‚¤ãƒ³ãƒãƒ¼ãƒˆå¾Œã«ä¸€è¦§ã‚’æ›´æ–°
                     Vm?.RefreshCommand.Execute(null);
                 }
             };
 
-            // ƒ^ƒOƒNƒ‰ƒEƒh‚Ì\’z
+            // â˜…ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒé–‹ã‹ã‚ŒãŸã‚¿ã‚¤ãƒŸãƒ³ã‚°ã§ ViewModel ã® RefreshCommand ã‚’å®Ÿè¡Œã™ã‚‹
+            this.Opened += this.MainWindow_Opened;
+
+            // ã‚¿ã‚°ã‚¯ãƒ©ã‚¦ãƒ‰ã®æ§‹ç¯‰
             BuildTagCloud(tagPanel);
         }
 
         /// <summary>
-        /// ƒ^ƒOƒNƒ‰ƒEƒhiƒ^ƒO‚ÌoŒ»•p“x‚É‰‚¶‚ÄƒtƒHƒ“ƒgƒTƒCƒY‚ğ•Ï‚¦‚½ˆê——j‚ğ\’z‚µA
-        /// w’è‚³‚ê‚½ <see cref="WrapPanel"/> ‚É”z’u‚µ‚Ü‚·B
+        /// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒåˆã‚ã¦è¡¨ç¤ºã•ã‚ŒãŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
+        /// ä¸€è¦§ã®åˆæœŸèª­ã¿è¾¼ã¿ã‚’è¡Œã„ã¾ã™ã€‚
         /// </summary>
-        /// <param name="panel">ƒ^ƒOƒNƒ‰ƒEƒh‚ğ•\¦‚·‚é <see cref="WrapPanel"/>B</param>
+        /// <param name="sender">ã‚¤ãƒ™ãƒ³ãƒˆé€ä¿¡å…ƒã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã€‚</param>
+        /// <param name="e">ã‚¤ãƒ™ãƒ³ãƒˆå¼•æ•°ã€‚</param>
+        private void MainWindow_Opened(object? sender, EventArgs e)
+        {
+            // ViewModel ãŒå­˜åœ¨ã—ãªã„å ´åˆã¯ä½•ã‚‚è¡Œã‚ãªã„
+            if (this.DataContext is not MainWindowViewModel vm) return;
+
+            // ViewModel ãŒè¨­å®šã•ã‚Œã¦ã„ã‚Œã° RefreshCommand ã‚’å®Ÿè¡Œ
+            if (vm != null && vm.RefreshCommand.CanExecute(null))
+            {
+                // â˜…æ›´æ–°ã‚³ãƒãƒ³ãƒ‰ã‚’å®Ÿè¡Œã—ã¦ä¸€è¦§ã‚’ãƒ­ãƒ¼ãƒ‰
+                vm.RefreshCommand.Execute(null);
+            }
+        }
+        /// <summary>
+        /// ã‚¿ã‚°ã‚¯ãƒ©ã‚¦ãƒ‰ï¼ˆã‚¿ã‚°ã®å‡ºç¾é »åº¦ã«å¿œã˜ã¦ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’å¤‰ãˆãŸä¸€è¦§ï¼‰ã‚’æ§‹ç¯‰ã—ã€
+        /// æŒ‡å®šã•ã‚ŒãŸ <see cref="WrapPanel"/> ã«é…ç½®ã—ã¾ã™ã€‚
+        /// </summary>
+        /// <param name="panel">ã‚¿ã‚°ã‚¯ãƒ©ã‚¦ãƒ‰ã‚’è¡¨ç¤ºã™ã‚‹ <see cref="WrapPanel"/>ã€‚</param>
         private void BuildTagCloud(WrapPanel panel)
         {
-            // ViewModel ‚ª‘¶İ‚µ‚È‚¢ê‡‚Í‰½‚às‚í‚È‚¢
-            if (Vm == null)
-            {
-                return;
-            }
+            // ViewModel ãŒå­˜åœ¨ã—ãªã„å ´åˆã¯ä½•ã‚‚è¡Œã‚ãªã„
+            if (this.DataContext is not MainWindowViewModel vm) return;
 
-            // Šù‘¶‚Ìƒ^ƒO—v‘f‚ğƒNƒŠƒA
+            // æ—¢å­˜ã®ã‚¿ã‚°è¦ç´ ã‚’ã‚¯ãƒªã‚¢
             panel.Children.Clear();
 
-            var vm = Vm;
-
-            // “o˜^‚³‚ê‚Ä‚¢‚éƒ^ƒOŒó•â‚ğæ“¾i•p“x‡j
+            // ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã‚¿ã‚°å€™è£œã‚’å–å¾—ï¼ˆé »åº¦é †ï¼‰
             var candidates = vm.GetAllTagCandidates();
 
             if (candidates.Count == 0)
             {
-                // ƒ^ƒO‚ª‘¶İ‚µ‚È‚¢ê‡‚Í‰½‚à•\¦‚µ‚È‚¢
+                // ã‚¿ã‚°ãŒå­˜åœ¨ã—ãªã„å ´åˆã¯ä½•ã‚‚è¡¨ç¤ºã—ãªã„
                 return;
             }
 
-            // ƒ^ƒO‚ÌoŒ»‰ñ”‚ğ”‚¦‚é‚½‚ß‚Ì«‘
+            // ã‚¿ã‚°ã®å‡ºç¾å›æ•°ã‚’æ•°ãˆã‚‹ãŸã‚ã®è¾æ›¸
             int max = 1;
             var svc = new CredentialService();
             var counts = new Dictionary<string, int>(System.StringComparer.OrdinalIgnoreCase);
 
-            // ‘S‘Šiî•ñ‚ğæ“¾i•œ†•s—v‚È‚Ì‚Å tryDecrypt: falsej
+            // å…¨è³‡æ ¼æƒ…å ±ã‚’å–å¾—ï¼ˆå¾©å·ä¸è¦ãªã®ã§ tryDecrypt: falseï¼‰
             foreach (var c in svc.GetAll(false))
             {
                 if (string.IsNullOrWhiteSpace(c.Tags))
@@ -303,12 +316,12 @@ namespace potetofly25.KeyManager2.Views
                     continue;
                 }
 
-                // ƒJƒ“ƒ}‹æØ‚è‚Åƒ^ƒO‚ğ•ª‰ğ‚µAoŒ»‰ñ”‚ğƒJƒEƒ“ƒg
+                // ã‚«ãƒ³ãƒåŒºåˆ‡ã‚Šã§ã‚¿ã‚°ã‚’åˆ†è§£ã—ã€å‡ºç¾å›æ•°ã‚’ã‚«ã‚¦ãƒ³ãƒˆ
                 foreach (var t in c.Tags.Split(',', System.StringSplitOptions.RemoveEmptyEntries | System.StringSplitOptions.TrimEntries))
                 {
                     counts[t] = counts.TryGetValue(t, out int value) ? value + 1 : 1;
 
-                    // Å‘åoŒ»‰ñ”‚ğXV
+                    // æœ€å¤§å‡ºç¾å›æ•°ã‚’æ›´æ–°
                     if (counts[t] > max)
                     {
                         max = counts[t];
@@ -316,10 +329,10 @@ namespace potetofly25.KeyManager2.Views
                 }
             }
 
-            // oŒ»‰ñ”‚Ì‘½‚¢‡‚Éƒ^ƒO‚ğ•À‚×‚Ä TextBlock ‚ğì¬
+            // å‡ºç¾å›æ•°ã®å¤šã„é †ã«ã‚¿ã‚°ã‚’ä¸¦ã¹ã¦ TextBlock ã‚’ä½œæˆ
             foreach (var kv in counts.OrderByDescending(kv => kv.Value))
             {
-                // oŒ»•p“x‚É‰‚¶‚ÄƒtƒHƒ“ƒgƒTƒCƒY‚ğ’²®iÅ’á 12pt ƒx[ƒX‚Éƒvƒ‰ƒXj
+                // å‡ºç¾é »åº¦ã«å¿œã˜ã¦ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’èª¿æ•´ï¼ˆæœ€ä½ 12pt ãƒ™ãƒ¼ã‚¹ã«ãƒ—ãƒ©ã‚¹ï¼‰
                 var size = 12 + (int)(12.0 * kv.Value / max);
 
                 var tb = new TextBlock
@@ -329,14 +342,14 @@ namespace potetofly25.KeyManager2.Views
                     Margin = new Avalonia.Thickness(4)
                 };
 
-                // ƒ^ƒOƒNƒŠƒbƒN‚ÅŒŸõƒeƒLƒXƒg‚É”½‰f‚µAƒtƒBƒ‹ƒ^‚ğ“K—p
+                // ã‚¿ã‚°ã‚¯ãƒªãƒƒã‚¯ã§æ¤œç´¢ãƒ†ã‚­ã‚¹ãƒˆã«åæ˜ ã—ã€ãƒ•ã‚£ãƒ«ã‚¿ã‚’é©ç”¨
                 tb.PointerPressed += (_, __) =>
                 {
                     vm.SearchText = kv.Key;
                     vm.ApplyFilter();
                 };
 
-                // ƒpƒlƒ‹‚É’Ç‰Á
+                // ãƒ‘ãƒãƒ«ã«è¿½åŠ 
                 panel.Children.Add(tb);
             }
         }

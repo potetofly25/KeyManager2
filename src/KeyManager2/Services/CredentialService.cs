@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using potetofly25.KeyManager2.Data;
 using potetofly25.KeyManager2.Models;
 using System;
@@ -8,48 +8,45 @@ using System.Linq;
 namespace potetofly25.KeyManager2.Services
 {
     /// <summary>
-    /// <see cref="Credential"/> �G���e�B�e�B�ɑ΂���i�����������܂Ƃ߂��T�[�r�X�N���X�ł��B
-    /// �ǉ��E�X�V�E�폜����ю擾�̃��W�b�N���J�v�Z�������A
-    /// �K�v�ɉ����� <see cref="AdvancedEncryptionService"/> ��p�����Í����E�������s���܂��B
+    /// <see cref="Credential"/> エンティティに対する永続化処理をまとめたサービスクラスです。
+    /// 追加・更新・削除および取得のロジックをカプセル化し、
+    /// 必要に応じて <see cref="AdvancedEncryptionService"/> を用いた暗号化・復号を行います。
     /// </summary>
     public class CredentialService
     {
         /// <summary>
-        /// �A�v���P�[�V�����Ŏg�p���� <see cref="KeyManagerDbContext"/> �̃C���X�^���X�ł��B
-        /// ���̃T�[�r�X���Œ��ڐ������ACredential �e�[�u���ւ̑���ɗ��p���܂��B
-        /// </summary>
-        private readonly KeyManagerDbContext _db = new();
-
-        /// <summary>
-        /// <see cref="CredentialService"/> �̐V�����C���X�^���X�����������܂��B
-        /// �R���X�g���N�^���Ńf�[�^�x�[�X�̑��݊m�F�ƍ쐬�i�K�v�ɉ����āj���s���܂��B
+        /// <see cref="CredentialService"/> の新しいインスタンスを初期化します。
+        /// コンストラクタ内でデータベースの存在確認と作成（必要に応じて）を行います。
         /// </summary>
         public CredentialService()
         {
-            // �f�[�^�x�[�X�����݂��Ȃ���΍쐬����i�e�[�u�����܂ށj
-            _db.Database.EnsureCreated();
+            // データベースが存在しなければ作成する（テーブルも含む）
+            using KeyManagerDbContext db = new();
+            db.Database.EnsureCreated();
         }
 
         /// <summary>
-        /// ���ׂĂ� <see cref="Credential"/> ���R�[�h���擾���܂��B
-        /// �I�v�V�����Ƃ��āA�}�X�^�[�p�X���[�h���ݒ�ς݂ňÍ����t���O�������Ă�����̂𕜍����ĕԋp���܂��B
+        /// すべての <see cref="Credential"/> レコードを取得します。
+        /// オプションとして、マスターパスワードが設定済みで暗号化フラグが立っているものを復号して返却します。
         /// </summary>
         /// <param name="tryDecrypt">
-        /// true �̏ꍇ�A<see cref="AdvancedEncryptionService.IsMasterSet"/> �� true �ł���ΈÍ������ꂽ�p�X���[�h�𕜍����ĕԂ��܂��B
-        /// false �̏ꍇ�A�p�X���[�h�͈Í������ꂽ�܂ܕԋp����܂��B
+        /// true の場合、<see cref="AdvancedEncryptionService.IsMasterSet"/> が true であれば暗号化されたパスワードを復号して返します。
+        /// false の場合、パスワードは暗号化されたまま返却されます。
         /// </param>
-        /// <returns>�S�Ă� <see cref="Credential"/> ���R�[�h�̃��X�g�B</returns>
+        /// <returns>全ての <see cref="Credential"/> レコードのリスト。</returns>
         public List<Credential> GetAll(bool tryDecrypt = true)
         {
-            // �g���b�L���O�Ȃ��őS Credential �� ID ���Ɏ擾
-            var list = _db.Credentials.AsNoTracking().OrderBy(c => c.Id).ToList();
+            using KeyManagerDbContext db = new();
 
-            // ���������݂��������������Ă���ꍇ�̂ݏ���
+            // トラッキングなしで全 Credential を ID 順に取得
+            var list = db.Credentials.AsNoTracking().OrderBy(c => c.Id).ToList();
+
+            // 復号を試みる条件が満たされている場合のみ処理
             if (tryDecrypt && AdvancedEncryptionService.IsMasterSet)
             {
                 foreach (var c in list)
                 {
-                    // �Í����ς݃t���O�������Ă�����̂����𕜍�
+                    // 暗号化済みフラグが立っているものだけを復号
                     if (c.IsEncrypted)
                     {
                         try
@@ -58,7 +55,7 @@ namespace potetofly25.KeyManager2.Services
                         }
                         catch
                         {
-                            // �����Ɏ��s�����ꍇ�͗�O������Ԃ��A���̂܂܈Í�����������c��
+                            // 復号に失敗した場合は例外を握りつぶし、そのまま暗号化文字列を残す
                         }
                     }
                 }
@@ -68,21 +65,23 @@ namespace potetofly25.KeyManager2.Services
         }
 
         /// <summary>
-        /// �V���� <see cref="Credential"/> ��ǉ����܂��B
-        /// �p�����[�^�ɉ����āA�ǉ��O�Ƀp�X���[�h���Í������邱�Ƃ��ł��܂��B
+        /// 新しい <see cref="Credential"/> を追加します。
+        /// パラメータに応じて、追加前にパスワードを暗号化することができます。
         /// </summary>
-        /// <param name="c">�ǉ��Ώۂ� <see cref="Credential"/> �C���X�^���X�B</param>
+        /// <param name="c">追加対象の <see cref="Credential"/> インスタンス。</param>
         /// <param name="encryptPassword">
-        /// true �̏ꍇ�A<see cref="AdvancedEncryptionService"/> ��p���ăp�X���[�h���Í������A
-        /// <see cref="Credential.IsEncrypted"/> �� true �ɐݒ肵�Ă���ۑ����܂��B
-        /// false �̏ꍇ�A�p�X���[�h�͕����̂܂ܕۑ�����A<see cref="Credential.IsEncrypted"/> �͕ύX����܂���B
+        /// true の場合、<see cref="AdvancedEncryptionService"/> を用いてパスワードを暗号化し、
+        /// <see cref="Credential.IsEncrypted"/> を true に設定してから保存します。
+        /// false の場合、パスワードは平文のまま保存され、<see cref="Credential.IsEncrypted"/> は変更されません。
         /// </param>
         /// <exception cref="InvalidOperationException">
-        /// <paramref name="encryptPassword"/> �� true ���� <see cref="AdvancedEncryptionService.IsMasterSet"/> �� false �̏ꍇ�ɃX���[����܂��B
+        /// <paramref name="encryptPassword"/> が true かつ <see cref="AdvancedEncryptionService.IsMasterSet"/> が false の場合にスローされます。
         /// </exception>
         public void Add(Credential c, bool encryptPassword = false)
         {
-            // �Í����w�肪����ꍇ�́A�}�X�^�[�ݒ��Ԃ��m�F���Ă���Í��������{
+            using KeyManagerDbContext db = new();
+
+            // 暗号化指定がある場合は、マスター設定状態を確認してから暗号化を実施
             if (encryptPassword)
             {
                 if (!AdvancedEncryptionService.IsMasterSet)
@@ -90,33 +89,35 @@ namespace potetofly25.KeyManager2.Services
                     throw new InvalidOperationException("Master not set");
                 }
 
-                // �p�X���[�h���Í������ăt���O��ݒ�
+                // パスワードを暗号化してフラグを設定
                 c.Password = AdvancedEncryptionService.EncryptString(c.Password);
                 c.IsEncrypted = true;
             }
 
-            // �V�K�G���e�B�e�B�Ƃ��Ēǉ�
-            _db.Credentials.Add(c);
+            // 新規エンティティとして追加
+            db.Credentials.Add(c);
 
-            // �ύX���f�[�^�x�[�X�֔��f
-            _db.SaveChanges();
+            // 変更をデータベースへ反映
+            db.SaveChanges();
         }
 
         /// <summary>
-        /// ������ <see cref="Credential"/> ���X�V���܂��B
-        /// �p�����[�^�ɉ����āA�X�V���Ƀp�X���[�h���Í����܂��͕����Ƃ��Ĉ����܂��B
+        /// 既存の <see cref="Credential"/> を更新します。
+        /// パラメータに応じて、更新時にパスワードを暗号化または平文として扱います。
         /// </summary>
-        /// <param name="c">�X�V�Ώۂ� <see cref="Credential"/> �C���X�^���X�B</param>
+        /// <param name="c">更新対象の <see cref="Credential"/> インスタンス。</param>
         /// <param name="encryptPassword">
-        /// true �̏ꍇ�A�p�X���[�h���Í����� <see cref="Credential.IsEncrypted"/> �� true �ɐݒ肵�܂��B
-        /// false �̏ꍇ�A�p�X���[�h�𕽕��Ƃ��Ĉ��� <see cref="Credential.IsEncrypted"/> �� false �ɐݒ肵�܂��B
+        /// true の場合、パスワードを暗号化し <see cref="Credential.IsEncrypted"/> を true に設定します。
+        /// false の場合、パスワードを平文として扱い <see cref="Credential.IsEncrypted"/> を false に設定します。
         /// </param>
         /// <exception cref="InvalidOperationException">
-        /// <paramref name="encryptPassword"/> �� true ���� <see cref="AdvancedEncryptionService.IsMasterSet"/> �� false �̏ꍇ�ɃX���[����܂��B
+        /// <paramref name="encryptPassword"/> が true かつ <see cref="AdvancedEncryptionService.IsMasterSet"/> が false の場合にスローされます。
         /// </exception>
         public void Update(Credential c, bool encryptPassword = false)
         {
-            // �Í����v��������ꍇ�́A�}�X�^�[�ݒ���m�F
+            using KeyManagerDbContext db = new();
+
+            // 暗号化要求がある場合は、マスター設定を確認
             if (encryptPassword)
             {
                 if (!AdvancedEncryptionService.IsMasterSet)
@@ -124,34 +125,36 @@ namespace potetofly25.KeyManager2.Services
                     throw new InvalidOperationException("Master not set");
                 }
 
-                // �p�X���[�h���Í������A�Í����ς݃t���O�𗧂Ă�
+                // パスワードを暗号化し、暗号化済みフラグを立てる
                 c.Password = AdvancedEncryptionService.EncryptString(c.Password);
                 c.IsEncrypted = true;
             }
             else
             {
-                // �Í������Ȃ��ꍇ�͈Í����t���O���I�t�ɂ���i�����Ƃ��Ĉ����j
+                // 暗号化しない場合は暗号化フラグをオフにする（平文として扱う）
                 c.IsEncrypted = false;
             }
 
-            // �����G���e�B�e�B�Ƃ��čX�V
-            _db.Credentials.Update(c);
+            // 既存エンティティとして更新
+            db.Credentials.Update(c);
 
-            // �ύX���f�[�^�x�[�X�֔��f
-            _db.SaveChanges();
+            // 変更をデータベースへ反映
+            db.SaveChanges();
         }
 
         /// <summary>
-        /// �w�肳�ꂽ <see cref="Credential"/> ���R�[�h���폜���܂��B
+        /// 指定された <see cref="Credential"/> レコードを削除します。
         /// </summary>
-        /// <param name="c">�폜�Ώۂ� <see cref="Credential"/> �C���X�^���X�B</param>
+        /// <param name="c">削除対象の <see cref="Credential"/> インスタンス。</param>
         public void Delete(Credential c)
         {
-            // �w��G���e�B�e�B���폜��ԂƂ��ă}�[�N
-            _db.Credentials.Remove(c);
+            using KeyManagerDbContext db = new();
 
-            // �ύX���f�[�^�x�[�X�֔��f
-            _db.SaveChanges();
+            // 指定エンティティを削除状態としてマーク
+            db.Credentials.Remove(c);
+
+            // 変更をデータベースへ反映
+            db.SaveChanges();
         }
     }
 }
